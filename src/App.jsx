@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { ShopProvider, useShop } from './context/ShopContext';
 import { ToastProvider } from './context/ToastContext';
@@ -20,6 +20,8 @@ import Contact from './pages/Contact';
 import About from './pages/About';
 import Showcase from './pages/Showcase';
 import Orders from './pages/Orders';
+import NotFound from './pages/NotFound';
+import LoginModal from './components/LoginModal';
 
 const AnimatedRoutes = () => {
   const location = useLocation();
@@ -38,6 +40,7 @@ const AnimatedRoutes = () => {
         <Route path="/about" element={<About />} />
         <Route path="/orders" element={<Orders />} />
         <Route path="/showcase" element={<Showcase />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </AnimatePresence>
   );
@@ -45,20 +48,46 @@ const AnimatedRoutes = () => {
 
 const Layout = () => {
   const location = useLocation();
-  const { setIsCartOpen } = useShop();
+  const { setIsCartOpen, user } = useShop();
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  
+  // Detect showcase and non-existent pages (404) to hide global Nav/Footer
+  const validRoutes = [
+    '/', '/products', '/cart', '/checkout', '/wishlist', 
+    '/login', '/signup', '/contact', '/about', '/orders', '/showcase'
+  ];
+  const isKnownRoute = validRoutes.includes(location.pathname) || location.pathname.startsWith('/product/');
   const isShowcase = location.pathname === '/showcase';
+  const is404 = !isKnownRoute;
+  const isSpecialPage = isShowcase || is404;
 
   useEffect(() => {
     setIsCartOpen(false);
   }, [location.pathname, setIsCartOpen]);
 
+  useEffect(() => {
+    // Show login popup only once per session for unauthenticated visitors
+    const hasPrompted = sessionStorage.getItem('aurazen_login_prompt_shown');
+    if (!user && !hasPrompted) {
+      // 1.5s delay for smooth premium entrance after landing visual load
+      const timer = setTimeout(() => {
+        setShowLoginModal(true);
+        sessionStorage.setItem('aurazen_login_prompt_shown', 'true');
+      }, 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [user]);
+
   return (
-    <div className={`flex flex-col min-h-screen bg-[#0a0a0a] text-white transition-colors duration-300 ${isShowcase ? 'overflow-hidden' : ''}`}>
-      {!isShowcase && <Navbar />}
-      <main className={`flex-grow ${isShowcase ? '' : 'pt-20'}`}>
+    <div className={`flex flex-col min-h-screen bg-[#0a0a0a] text-white transition-colors duration-300 ${isSpecialPage ? 'overflow-hidden' : ''}`}>
+      {!isSpecialPage && <Navbar />}
+      <main className={`flex-grow ${isSpecialPage ? '' : 'pt-20'}`}>
         <AnimatedRoutes />
       </main>
-      {!isShowcase && <Footer />}
+      {!isSpecialPage && <Footer />}
+
+      {/* Global Peeking Panda Login Modal */}
+      <LoginModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
     </div>
   );
 };

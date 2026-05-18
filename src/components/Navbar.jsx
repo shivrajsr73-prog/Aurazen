@@ -33,7 +33,7 @@ const Navbar = () => {
 
   return (
     <>
-      <header className={`fixed top-0 w-full z-40 px-3 transition-all duration-500 ${isScrolled ? 'py-3' : 'py-5 md:py-6'}`}>
+      <header className="absolute top-0 w-full z-40 px-3 py-5 md:py-6 transition-all duration-500">
         <div className={`luxury-navbar-panel w-full px-4 lg:px-8 flex items-center justify-between gap-5 ${isScrolled ? 'is-scrolled' : ''}`}>
           <div className="flex items-center gap-6 lg:gap-8 min-w-0">
             <Link to="/" className="group flex items-center space-x-2">
