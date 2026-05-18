@@ -1,15 +1,17 @@
 import { Link } from 'react-router-dom';
-import { ShoppingCart, Heart, Star } from 'lucide-react';
+import { ShoppingCart, Heart, Star, Minus, Plus } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useShop } from '../context/ShopContext';
 import { useToast } from '../context/ToastContext';
 import Button from './ui/Button';
 
 const ProductCard = ({ product }) => {
-  const { addToCart, wishlist, toggleWishlist } = useShop();
+  const { addToCart, cart, wishlist, toggleWishlist, updateQuantity } = useShop();
   const toast = useToast();
 
   const isWishlisted = wishlist.some(item => item.id === product.id);
+  const cartItem = cart.find(item => item.id === product.id);
+  const cartQuantity = cartItem?.quantity || 0;
 
   const handleAddToCart = () => {
     addToCart(product);
@@ -68,13 +70,36 @@ const ProductCard = ({ product }) => {
           <span className="text-2xl font-black text-white tracking-tight">
             ₹{Number(product.price || 0).toFixed(2)}
           </span>
-          <Button 
-            variant="ghost" 
-            className="!h-11 !w-11 !rounded-full !p-0"
-            onClick={handleAddToCart}
-          >
-            <ShoppingCart size={18} strokeWidth={2} />
-          </Button>
+          {cartQuantity > 0 ? (
+            <div className="flex h-9 items-center rounded-lg border border-[#333] bg-[#0a0a0a]">
+              <button
+                type="button"
+                onClick={() => updateQuantity(product.id, cartQuantity - 1)}
+                className="flex h-9 w-9 items-center justify-center text-gray-400 transition-colors hover:text-[#00F3FF]"
+                aria-label={`Decrease ${product.name} quantity`}
+              >
+                <Minus size={15} />
+              </button>
+              <span className="w-8 text-center text-sm font-black text-white">{cartQuantity}</span>
+              <button
+                type="button"
+                onClick={() => updateQuantity(product.id, cartQuantity + 1)}
+                className="flex h-9 w-9 items-center justify-center text-gray-400 transition-colors hover:text-[#00F3FF]"
+                aria-label={`Increase ${product.name} quantity`}
+              >
+                <Plus size={15} />
+              </button>
+            </div>
+          ) : (
+            <Button
+              variant="ghost"
+              className="!h-11 !w-11 !rounded-full !p-0"
+              onClick={handleAddToCart}
+              aria-label={`Add ${product.name} to cart`}
+            >
+              <ShoppingCart size={18} strokeWidth={2} />
+            </Button>
+          )}
         </div>
       </div>
     </motion.div>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { ShoppingBag, Menu, X, User, Heart, Search, LogOut, Package } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -9,6 +9,7 @@ const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const profileMenuRef = useRef(null);
   const { cartCount, wishlist, user, logout, searchQuery, setSearchQuery } = useShop();
   const toast = useToast();
   const location = useLocation();
@@ -19,6 +20,19 @@ const Navbar = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  useEffect(() => {
+    if (!isProfileOpen) return;
+
+    const handleOutsideClick = (event) => {
+      if (!profileMenuRef.current?.contains(event.target)) {
+        setIsProfileOpen(false);
+      }
+    };
+
+    document.addEventListener('pointerdown', handleOutsideClick);
+    return () => document.removeEventListener('pointerdown', handleOutsideClick);
+  }, [isProfileOpen]);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -109,7 +123,7 @@ const Navbar = () => {
             )}
 
             {user && (
-              <div className="hidden md:flex items-center relative z-50">
+              <div ref={profileMenuRef} className="hidden md:flex items-center relative z-50">
                 <button 
                   onClick={() => setIsProfileOpen(!isProfileOpen)} 
                   className="luxury-icon-button h-10 w-10 rounded-full"
@@ -130,7 +144,11 @@ const Navbar = () => {
                         <p className="text-sm font-medium text-white truncate">{user.phone || user.email}</p>
                       </div>
                       <div className="py-1">
-                        <Link to="/orders" className="flex items-center px-4 py-2 text-sm text-gray-300 hover:text-[#00F3FF] hover:bg-[#111111] transition-colors">
+                        <Link
+                          to="/orders"
+                          onClick={() => setIsProfileOpen(false)}
+                          className="flex items-center px-4 py-2 text-sm text-gray-300 hover:text-[#00F3FF] hover:bg-[#111111] transition-colors"
+                        >
                           <Package size={16} className="mr-3" />
                           Your Orders
                         </Link>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Mail, Lock, User, Phone, Key, Eye, EyeOff } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useShop } from '../context/ShopContext';
 import { useToast } from '../context/ToastContext';
 import '../pages/Auth.css';
@@ -28,6 +29,7 @@ export default function LoginModal({ isOpen, onClose }) {
   
   const { login } = useShop();
   const toast = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleMessage = (event) => {
@@ -41,11 +43,12 @@ export default function LoginModal({ isOpen, onClose }) {
         login(mockUser);
         toast.success(`Welcome back, ${name}! Signed in via ${provider}.`);
         onClose();
+        navigate('/', { replace: true });
       }
     };
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
-  }, [login, onClose, toast]);
+  }, [login, navigate, onClose, toast]);
 
   useEffect(() => {
     const handleMouseMove = (e) => {
@@ -151,6 +154,7 @@ export default function LoginModal({ isOpen, onClose }) {
         setMode('login');
         setForgotStep('request');
         onClose();
+        navigate('/', { replace: true });
       }
       return;
     }
@@ -172,12 +176,14 @@ export default function LoginModal({ isOpen, onClose }) {
       toast.success("Account created successfully!");
       login(newUser);
       onClose();
+      navigate('/', { replace: true });
     } else {
       const user = users.find(u => u.email === email && u.password === password);
       if (user) {
         toast.success(`Welcome back, ${user.name}!`);
         login(user);
         onClose();
+        navigate('/', { replace: true });
       } else {
         toast.error("Invalid email or password. Please sign up first if you don't have an account.");
       }

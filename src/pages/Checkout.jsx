@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useShop } from '../context/ShopContext';
 import { useToast } from '../context/ToastContext';
@@ -11,6 +11,8 @@ const Checkout = () => {
   const { cart, cartTotal, clearCart } = useShop();
   const toast = useToast();
   const navigate = useNavigate();
+  const checkoutFormRef = useRef(null);
+  const [checkoutStep, setCheckoutStep] = useState('address');
   const [couponCode, setCouponCode] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState(null);
   const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
@@ -107,9 +109,30 @@ const Checkout = () => {
     toast.info('Coupon removed.');
   };
 
+  const handleContinueToPayment = () => {
+    const form = checkoutFormRef.current;
+    const addressFields = ['firstName', 'lastName', 'email', 'address', 'city', 'postalCode'];
+    const firstInvalidField = addressFields
+      .map((fieldName) => form?.elements[fieldName])
+      .find((field) => field && !field.checkValidity());
+
+    if (firstInvalidField) {
+      firstInvalidField.reportValidity();
+      return;
+    }
+
+    setCheckoutStep('payment');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const handleCheckout = async (e) => {
     e.preventDefault();
     if (cart.length === 0) return;
+
+    if (checkoutStep === 'address') {
+      handleContinueToPayment();
+      return;
+    }
     
     try {
       const formData = new FormData(e.target);
@@ -170,14 +193,31 @@ const Checkout = () => {
     <motion.div initial="initial" animate="in" exit="out" variants={pageVariants} className="container mx-auto px-6 py-12">
       <h1 className="text-4xl font-black text-white mb-12 tracking-tighter uppercase">Checkout</h1>
       
-      <form onSubmit={handleCheckout} className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+      <form ref={checkoutFormRef} onSubmit={handleCheckout} className="grid grid-cols-1 lg:grid-cols-3 gap-12">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="lg:col-span-2 space-y-8"
         >
+          <div className="flex items-center gap-3 rounded-2xl border border-[#1E1E1E] bg-[#111111] p-3">
+            <button
+              type="button"
+              onClick={() => setCheckoutStep('address')}
+              className={`flex-1 rounded-xl px-4 py-3 text-xs font-black uppercase tracking-widest transition-all ${checkoutStep === 'address' ? 'bg-[#00F3FF] text-black' : 'text-gray-400 hover:text-white'}`}
+            >
+              1. Address
+            </button>
+            <button
+              type="button"
+              onClick={handleContinueToPayment}
+              className={`flex-1 rounded-xl px-4 py-3 text-xs font-black uppercase tracking-widest transition-all ${checkoutStep === 'payment' ? 'bg-[#00F3FF] text-black' : 'text-gray-400 hover:text-white'}`}
+            >
+              2. Payment
+            </button>
+          </div>
+
           <div className="bg-[#111111] p-8 rounded-2xl border border-[#1E1E1E]">
-            <h2 className="text-xl font-bold uppercase tracking-wider text-white mb-6">Shipping Information</h2>
+            <h2 className="text-xl font-bold uppercase tracking-wider text-white mb-6">Shipping Address</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Input label="First Name" name="firstName" placeholder="Jane" required />
               <Input label="Last Name" name="lastName" placeholder="Doe" required />
@@ -186,28 +226,39 @@ const Checkout = () => {
               <Input label="City" name="city" placeholder="Neo Tokyo" required />
               <Input label="Postal Code" name="postalCode" placeholder="100-0001" required />
             </div>
+            {checkoutStep === 'address' && (
+              <Button type="button" variant="primary" className="mt-8 px-8 py-4" onClick={handleContinueToPayment}>
+                Continue to Payment
+              </Button>
+            )}
           </div>
 
-          <div className="bg-[#111111] p-8 rounded-2xl border border-[#1E1E1E]">
-            <h2 className="text-xl font-bold uppercase tracking-wider text-white mb-6">Payment Method</h2>
-            <div className="space-y-6">
-              <div className="flex items-center justify-between bg-[#0a0a0a] p-4 rounded-xl border border-[#00F3FF] shadow-[0_0_10px_rgba(0,243,255,0.1)]">
-                <div className="flex items-center space-x-3">
-                  <input type="radio" name="payment" id="card" className="text-[#00F3FF] focus:ring-[#00F3FF] bg-[#111111] border-[#333]" defaultChecked />
-                  <label htmlFor="card" className="text-white font-bold uppercase tracking-widest text-sm">Credit / Debit Card</label>
+          {checkoutStep === 'payment' && (
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-[#111111] p-8 rounded-2xl border border-[#1E1E1E]"
+            >
+              <h2 className="text-xl font-bold uppercase tracking-wider text-white mb-6">Payment Method</h2>
+              <div className="space-y-6">
+                <div className="flex items-center justify-between bg-[#0a0a0a] p-4 rounded-xl border border-[#00F3FF] shadow-[0_0_10px_rgba(0,243,255,0.1)]">
+                  <div className="flex items-center space-x-3">
+                    <input type="radio" name="payment" id="card" className="text-[#00F3FF] focus:ring-[#00F3FF] bg-[#111111] border-[#333]" defaultChecked />
+                    <label htmlFor="card" className="text-white font-bold uppercase tracking-widest text-sm">Credit / Debit Card</label>
+                  </div>
+                  <div className="flex space-x-2">
+                    <div className="w-8 h-5 bg-[#333] rounded"></div>
+                    <div className="w-8 h-5 bg-[#333] rounded"></div>
+                  </div>
                 </div>
-                <div className="flex space-x-2">
-                  <div className="w-8 h-5 bg-[#333] rounded"></div>
-                  <div className="w-8 h-5 bg-[#333] rounded"></div>
+                <div className="grid grid-cols-2 gap-6 mt-4">
+                  <Input name="cardNumber" placeholder="Card Number" className="col-span-2" required />
+                  <Input name="cardExpiry" placeholder="MM/YY" required />
+                  <Input name="cardCvc" placeholder="CVC" required />
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-6 mt-4">
-                <Input placeholder="Card Number" className="col-span-2" required />
-                <Input placeholder="MM/YY" required />
-                <Input placeholder="CVC" required />
-              </div>
-            </div>
-          </div>
+            </motion.div>
+          )}
         </motion.div>
 
         <motion.div 
@@ -291,9 +342,15 @@ const Checkout = () => {
               </div>
             </div>
 
-            <Button type="submit" variant="primary" className="w-full mt-8 py-4">
-              Complete Order
-            </Button>
+            {checkoutStep === 'address' ? (
+              <Button type="button" variant="primary" className="w-full mt-8 py-4" onClick={handleContinueToPayment}>
+                Continue to Payment
+              </Button>
+            ) : (
+              <Button type="submit" variant="primary" className="w-full mt-8 py-4">
+                Complete Order
+              </Button>
+            )}
             
             <p className="text-center text-xs text-gray-500 mt-4 font-medium">
               By completing your order, you agree to our Terms of Service and Privacy Policy.

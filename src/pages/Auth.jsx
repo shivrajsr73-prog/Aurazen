@@ -35,6 +35,26 @@ const Auth = ({ initialMode = 'login' }) => {
   }, [initialMode]);
 
   useEffect(() => {
+    const handleMessage = (event) => {
+      if (event.data && event.data.type === 'AURAZEN_OAUTH_SUCCESS') {
+        const { name, email, provider } = event.data;
+        const mockUser = {
+          name,
+          email,
+          avatar: `https://api.dicebear.com/7.x/initials/svg?seed=${name}`,
+        };
+
+        login(mockUser);
+        toast.success(`Welcome back, ${name}! Signed in via ${provider}.`);
+        navigate('/', { replace: true });
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, [login, navigate, toast]);
+
+  useEffect(() => {
     const handleMouseMove = (e) => {
       if (isPasswordFocused || !containerRef.current) return;
 
