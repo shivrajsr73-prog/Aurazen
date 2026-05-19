@@ -22,6 +22,22 @@ const Checkout = () => {
   const [showScannerModal, setShowScannerModal] = useState(false);
   const [timeLeft, setTimeLeft] = useState(300);
   const [orderConfirmed, setOrderConfirmed] = useState(false);
+  const [savedAddress, setSavedAddress] = useState(null);
+  const [isEditingAddress, setIsEditingAddress] = useState(true);
+
+  useEffect(() => {
+    const addressKey = user?.email ? `aurawear_address_${user.email}` : 'aurawear_address_guest';
+    const stored = localStorage.getItem(addressKey);
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        setSavedAddress(parsed);
+        setIsEditingAddress(false);
+      } catch (e) {
+        console.error("Error parsing saved address", e);
+      }
+    }
+  }, [user]);
 
   useEffect(() => {
     let interval = null;
@@ -57,11 +73,11 @@ const Checkout = () => {
   const orderTotal = discountedSubtotal + taxAmount;
 
   useEffect(() => {
-    if (checkoutStep === 'address') {
+    if (checkoutStep === 'address' && isEditingAddress) {
       const form = checkoutFormRef.current;
       
       // Prevent asking if already filled
-      if (form && (form.elements['city']?.value || form.elements['postalCode']?.value)) {
+      if (form && (form.elements['city']?.value || form.elements['pincode']?.value)) {
         return;
       }
 
@@ -84,8 +100,8 @@ const Checkout = () => {
                     if (form.elements['city'] && city && !form.elements['city'].value) {
                       form.elements['city'].value = city;
                     }
-                    if (form.elements['postalCode'] && postcode && !form.elements['postalCode'].value) {
-                      form.elements['postalCode'].value = postcode;
+                    if (form.elements['pincode'] && postcode && !form.elements['pincode'].value) {
+                      form.elements['pincode'].value = postcode;
                     }
                     toast.success("Location auto-filled successfully!");
                   }
@@ -196,17 +212,36 @@ const Checkout = () => {
   };
 
   const handleContinueToPayment = () => {
-    const form = checkoutFormRef.current;
-    const addressFields = ['firstName', 'lastName', 'email', 'address', 'city', 'postalCode'];
-    const firstInvalidField = addressFields
-      .map((fieldName) => form?.elements[fieldName])
-      .find((field) => field && !field.checkValidity());
+    if (isEditingAddress) {
+      const form = checkoutFormRef.current;
+      const addressFields = ['name', 'contactNumber', 'email', 'houseNo', 'roadName', 'pincode', 'city', 'state'];
+      const firstInvalidField = addressFields
+        .map((fieldName) => form?.elements[fieldName])
+        .find((field) => field && !field.checkValidity());
 
-    if (firstInvalidField) {
-      firstInvalidField.reportValidity();
-      return;
+      if (firstInvalidField) {
+        firstInvalidField.reportValidity();
+        return;
+      }
+      
+      const formData = new FormData(form);
+      const currentCustomerInfo = {
+        name: formData.get('name'),
+        contactNumber: formData.get('contactNumber'),
+        email: formData.get('email'),
+        houseNo: formData.get('houseNo'),
+        roadName: formData.get('roadName'),
+        pincode: formData.get('pincode'),
+        city: formData.get('city'),
+        state: formData.get('state'),
+        landmark: formData.get('landmark')
+      };
+
+      const addressKey = user?.email ? `aurawear_address_${user.email}` : 'aurawear_address_guest';
+      localStorage.setItem(addressKey, JSON.stringify(currentCustomerInfo));
+      setSavedAddress(currentCustomerInfo);
+      setIsEditingAddress(false);
     }
-
     setCheckoutStep('payment');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -221,38 +256,59 @@ const Checkout = () => {
     }
     
     try {
-      const formData = new FormData(e.target);
-      const customerInfo = {
-        firstName: formData.get('firstName'),
-        lastName: formData.get('lastName'),
-        email: formData.get('email'),
-        address: formData.get('address'),
-        city: formData.get('city'),
-        postalCode: formData.get('postalCode')
-      };
+      const customerInfo = savedAddress;
+      if (!customerInfo) {
+        toast.error("Please provide a shipping address.");
+        setCheckoutStep('address');
+        setIsEditingAddress(true);
+        return;
+      }
+
+      const fullAddress = `${customerInfo.houseNo}, ${customerInfo.roadName}${customerInfo.landmark ? ', Near ' + customerInfo.landmark : ''}, ${customerInfo.city}, ${customerInfo.state}, ${customerInfo.pincode}. Phone: ${customerInfo.contactNumber}`;
 
       const orderData = {
-        customer_name: `${customerInfo.firstName} ${customerInfo.lastName}`,
+        customer_name: customerInfo.name,
         customer_email: user?.email || customerInfo.email,
         total_amount: orderTotal,
         status: 'Processing',
-        items: cart.map(item => ({
+        shipping_address: fullAddress,
+        items: cart.map((item, idx) => ({
           productId: item.docId || item.id,
           name: item.name,
           price: item.price,
           quantity: item.quantity,
           size: item.size || 'M',
+          image: item.image,
+          ...(idx === 0 ? { _fallback_address: fullAddress } : {})
         }))
       };
 
-      const { error } = await supabase.from('orders').insert([orderData]);
-      if (error) throw error;
+      let res = await supabase.from('orders').insert([orderData]);
+      
+      // Fallback if shipping_address column doesn't exist
+      if (res.error && res.error.message?.includes('shipping_address')) {
+        console.warn("Column shipping_address might not exist. Retrying without it...");
+        const fallbackData = { ...orderData, address: orderData.shipping_address };
+        delete fallbackData.shipping_address;
+        res = await supabase.from('orders').insert([fallbackData]);
+        
+        // If 'address' also doesn't exist, try removing both but save it in items JSON as a fallback!
+        if (res.error && res.error.message?.includes('address')) {
+           delete fallbackData.address;
+           if (fallbackData.items && fallbackData.items.length > 0) {
+             fallbackData.items[0]._fallback_address = orderData.shipping_address;
+           }
+           res = await supabase.from('orders').insert([fallbackData]);
+        }
+      }
+
+      if (res.error) throw res.error;
       
       clearCart();
       setOrderConfirmed(true);
     } catch (error) {
       console.error("Error creating order: ", error);
-      toast.error("Failed to place order.");
+      toast.error(`Order failed: ${error.message || error.details || 'Unknown error'}`);
     }
   };
 
@@ -302,15 +358,56 @@ const Checkout = () => {
           </div>
 
           <div className="bg-white/65 p-8 rounded-2xl border border-[#E8DCCF] shadow-[0_20px_60px_rgba(72,53,34,0.08)] backdrop-blur-xl">
-            <h2 className="text-xl font-bold uppercase tracking-wider text-[#111111] mb-6">Shipping Address</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Input label="First Name" name="firstName" placeholder="Jane" required />
-              <Input label="Last Name" name="lastName" placeholder="Doe" required />
-              <Input label="Email Address" name="email" type="email" placeholder="jane@example.com" className="md:col-span-2" required />
-              <Input label="Address" name="address" placeholder="123 Cream Ave" className="md:col-span-2" required />
-              <Input label="City" name="city" placeholder="Mumbai" required />
-              <Input label="Postal Code" name="postalCode" placeholder="100-0001" required />
-            </div>
+            {(!isEditingAddress && savedAddress) ? (
+              <div>
+                <div className="flex items-center gap-2 text-[#111111] font-bold text-lg mb-6">
+                  <svg className="w-5 h-5 text-[#7d55bd]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  Delivery Address
+                </div>
+                <div className="border border-[#E8DCCF] rounded-xl p-6 bg-[#FFFDF9] relative">
+                  <button type="button" onClick={() => setIsEditingAddress(true)} className="absolute top-6 right-6 text-sm font-black text-[#7d55bd] uppercase tracking-widest hover:text-[#111111] transition-colors">
+                    Change
+                  </button>
+                  <p className="font-bold text-[#111111] text-lg mb-2">{savedAddress.name}</p>
+                  <p className="text-[#625b52] font-medium leading-relaxed mb-3 pr-20">
+                    {savedAddress.houseNo}, {savedAddress.roadName}{savedAddress.landmark ? `, Near ${savedAddress.landmark}` : ''},<br/>
+                    {savedAddress.city}, {savedAddress.state}, {savedAddress.pincode}
+                  </p>
+                  <p className="font-bold text-[#111111]">{savedAddress.contactNumber}</p>
+                </div>
+              </div>
+            ) : (
+              <div>
+                <h2 className="text-xl font-bold uppercase tracking-wider text-[#111111] mb-6">Shipping Address</h2>
+                <div className="grid grid-cols-1 gap-6">
+                  <Input label="Name" name="name" placeholder="Full Name" defaultValue={savedAddress?.name || ''} required />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <Input label="Contact Number" name="contactNumber" type="tel" placeholder="+91 9876543210" defaultValue={savedAddress?.contactNumber || ''} required />
+                    <Input label="Email Address" name="email" type="email" placeholder="jane@example.com" defaultValue={savedAddress?.email || user?.email || ''} required />
+                  </div>
+                  
+                  <div className="mt-4 flex items-center gap-2 text-[#111111] font-bold text-lg border-b border-[#E8DCCF] pb-2">
+                    <svg className="w-5 h-5 text-[#7d55bd]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    Address
+                  </div>
+
+                  <Input label="House no./ Building name" name="houseNo" placeholder="House no./ Building name" defaultValue={savedAddress?.houseNo || ''} required />
+                  <Input label="Road name / Area / Colony" name="roadName" placeholder="Road name / Area / Colony" defaultValue={savedAddress?.roadName || ''} required />
+                  <Input label="Pincode" name="pincode" placeholder="Pincode" defaultValue={savedAddress?.pincode || ''} required />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <Input label="City" name="city" placeholder="City" defaultValue={savedAddress?.city || ''} required />
+                    <Input label="State" name="state" placeholder="State" defaultValue={savedAddress?.state || ''} required />
+                  </div>
+                  <Input label="Nearby Famous Place/Shop/School,etc.(optional)" name="landmark" placeholder="Landmark (Optional)" defaultValue={savedAddress?.landmark || ''} />
+                </div>
+              </div>
+            )}
             {checkoutStep === 'address' && (
               <Button type="button" variant="primary" className="mt-8 px-8 py-4" onClick={handleContinueToPayment}>
                 Continue to Payment

@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ShoppingCart, Heart, Star, Minus, Plus } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useShop } from '../context/ShopContext';
@@ -8,14 +8,15 @@ import Button from './ui/Button';
 const ProductCard = ({ product }) => {
   const { addToCart, cart, wishlist, toggleWishlist, updateQuantity } = useShop();
   const toast = useToast();
+  const navigate = useNavigate();
 
   const isWishlisted = wishlist.some(item => item.id === product.id);
   const cartItem = cart.find(item => item.id === product.id);
   const cartQuantity = cartItem?.quantity || 0;
 
   const handleAddToCart = () => {
-    addToCart(product);
-    toast.success(`Added ${product.name} to cart`);
+    toast.error('Please select a size first!');
+    navigate(`/product/${product.id}`);
   };
 
   const handleWishlist = () => {

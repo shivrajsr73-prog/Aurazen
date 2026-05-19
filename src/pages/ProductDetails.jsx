@@ -6,12 +6,14 @@ import { useShop } from '../context/ShopContext';
 import { useToast } from '../context/ToastContext';
 import Button from '../components/ui/Button';
 import AnimatedAddToCartButton from '../components/AnimatedAddToCartButton';
+import SizeChartModal from '../components/SizeChartModal';
 
 const ProductDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [selectedSize, setSelectedSize] = useState('M');
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [isSizeChartOpen, setIsSizeChartOpen] = useState(false);
   const { allProducts, productsLoading, addToCart, wishlist, toggleWishlist } = useShop();
   const toast = useToast();
 
@@ -20,6 +22,25 @@ const ProductDetails = () => {
   const productImages = product?.productImages?.length ? product.productImages : [product?.image].filter(Boolean);
   const activeImage = productImages[activeImageIndex] || productImages[0] || '';
   const hasMultipleImages = productImages.length > 1;
+
+  // Group variants by name
+  const colorVariants = allProducts.filter(p => 
+    p.name && product && p.name.trim().toLowerCase() === product.name.trim().toLowerCase()
+  );
+  
+  const uniqueVariants = [];
+  const seenColors = new Set();
+  for (const v of colorVariants) {
+    const colorKey = (v.color || 'Default').toLowerCase();
+    if (!seenColors.has(colorKey)) {
+      seenColors.add(colorKey);
+      uniqueVariants.push(v);
+    } else if (product && v.id === product.id) {
+      // Prioritize current product for its color slot
+      const idx = uniqueVariants.findIndex(item => (item.color || 'Default').toLowerCase() === colorKey);
+      if (idx !== -1) uniqueVariants[idx] = v;
+    }
+  }
 
   const showPreviousImage = () => {
     setActiveImageIndex((currentIndex) =>
@@ -49,6 +70,11 @@ const ProductDetails = () => {
         <Link to="/products" className="text-[#625b52] hover:text-[#7d55bd] underline">Return to Shop</Link>
       </div>
     );
+  }
+
+  // Reset active image when product changes
+  if (activeImageIndex >= productImages.length) {
+    setActiveImageIndex(0);
   }
 
   const handleAddToCart = () => {
@@ -148,17 +174,70 @@ const ProductDetails = () => {
             ₹{Number(product.price || 0).toFixed(2)}
           </div>
 
-          <p className="text-[#625b52] text-lg mb-10 leading-relaxed font-light">
+          <p className="text-[#625b52] text-lg mb-8 leading-relaxed font-light">
             {product.description}
             <br/><br/>
             Crafted with premium materials and designed for the modern aesthetic. This piece features an oversized drop-shoulder fit, heavyweight cotton construction, and minimal branding.
           </p>
 
+          {/* Colour Variants */}
+          {uniqueVariants.length > 0 && (uniqueVariants.length > 1 || product.color) && (
+            <div className="mb-8">
+              <h3 className="text-[#111111] font-normal text-sm mb-3 flex items-center gap-1">
+                Colour: <span className="font-bold text-[#111111] capitalize text-base">{product.color || 'Default'}</span>
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {uniqueVariants.map(variant => {
+                  const isSelected = variant.id === product.id;
+                  const vImage = variant.productImages?.[0] || variant.image;
+                  const price = Number(variant.price || 0);
+                  const originalPrice = variant.originalPrice ? Number(variant.originalPrice) : price + 100;
+                  return (
+                    <button 
+                      key={variant.id}
+                      onClick={() => {
+                        navigate(`/product/${variant.id}`);
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                      className={`flex flex-col w-[90px] bg-white rounded-md overflow-hidden border transition-all duration-200 text-left ${
+                        isSelected 
+                          ? 'border-[#2370f4] shadow-[0_0_0_1px_#2370f4]' 
+                          : 'border-gray-300 hover:border-gray-400'
+                      }`}
+                      title={variant.color || 'Default'}
+                    >
+                      <div className="w-full h-24 p-1 bg-white flex items-center justify-center">
+                        {vImage ? (
+                          <img 
+                            src={vImage} 
+                            alt={variant.color || variant.name} 
+                            className="max-w-full max-h-full object-contain"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-[#F8F3EC] flex items-center justify-center text-[#7a7168] text-xs">No img</div>
+                        )}
+                      </div>
+                      <div className="px-2 py-1.5 border-t border-gray-200 w-full bg-white">
+                        <div className="text-[13px] font-medium text-[#111] leading-tight">₹{price.toFixed(2)}</div>
+                        <div className="text-[11px] text-gray-500 line-through leading-tight">₹{originalPrice.toFixed(2)}</div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
           {/* Sizing */}
           <div className="mb-10">
             <div className="flex justify-between items-end mb-3">
               <h3 className="text-[#111111] font-bold uppercase tracking-wider text-sm">Select Size</h3>
-              <button className="text-[#7a7168] hover:text-[#7d55bd] text-sm font-medium underline underline-offset-4 transition-colors">Size Guide</button>
+              <button 
+                onClick={() => setIsSizeChartOpen(true)}
+                className="text-[#7a7168] hover:text-[#7d55bd] text-sm font-medium underline underline-offset-4 transition-colors"
+              >
+                Size Guide
+              </button>
             </div>
             <div className="flex flex-wrap gap-3">
               {['S', 'M', 'L', 'XL'].map(size => (
@@ -211,6 +290,7 @@ const ProductDetails = () => {
           </div>
         </div>
       </div>
+      <SizeChartModal isOpen={isSizeChartOpen} onClose={() => setIsSizeChartOpen(false)} />
     </motion.div>
   );
 };

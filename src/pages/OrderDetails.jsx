@@ -101,6 +101,16 @@ const OrderDetails = () => {
           </div>
         </div>
 
+        <div className="mb-8 p-6 bg-[#F8F3EC] rounded-2xl border border-[#E8DCCF]">
+          <h3 className="text-sm font-black uppercase tracking-widest text-[#7a7168] mb-2">Customer Info</h3>
+          <p className="text-[#111111] font-bold text-lg">{order.customer_name}</p>
+          {(order.shipping_address || order.address || (order.items && order.items[0] && order.items[0]._fallback_address)) ? (
+            <p className="text-[#111111] font-medium mt-1">{order.shipping_address || order.address || order.items[0]._fallback_address}</p>
+          ) : (
+            <p className="text-[#7a7168] italic mt-1 text-sm">Address details will be shown here once available.</p>
+          )}
+        </div>
+
         <div className="mb-12">
           <h3 className="text-lg font-black uppercase tracking-wider text-[#111111] mb-6">Items Ordered</h3>
           <div className="space-y-4">
@@ -108,7 +118,11 @@ const OrderDetails = () => {
               <div key={idx} className="flex flex-col sm:flex-row justify-between sm:items-center bg-white/40 p-4 rounded-2xl border border-[#E8DCCF]/50 gap-4">
                 <div className="flex items-center gap-4">
                   <div className="w-16 h-16 bg-[#F8F3EC] rounded-xl overflow-hidden flex-shrink-0 border border-[#E8DCCF] flex items-center justify-center text-[#7a7168]">
-                    <Package size={24} />
+                    {item.image ? (
+                      <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <Package size={24} />
+                    )}
                   </div>
                   <div>
                     <p className="font-bold text-[#111111] text-lg">{item.name || 'Product Name'}</p>

@@ -182,9 +182,20 @@ export const ShopProvider = ({ children }) => {
     return matchesSearch && matchesCategory;
   });
 
+  // Group by name for display in lists
+  const groupedProducts = [];
+  const seenProductNames = new Set();
+  for (const product of filteredProducts) {
+    const nameKey = (product.name || '').trim().toLowerCase();
+    if (!seenProductNames.has(nameKey)) {
+      seenProductNames.add(nameKey);
+      groupedProducts.push(product);
+    }
+  }
+
   return (
     <ShopContext.Provider value={{
-      products: filteredProducts,
+      products: groupedProducts,
       allProducts: productsList,
       productsLoading,
       productsError,

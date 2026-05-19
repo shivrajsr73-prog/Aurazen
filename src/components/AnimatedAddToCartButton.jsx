@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShoppingCart, Shirt } from 'lucide-react';
+import { ShoppingCart, Shirt, Check } from 'lucide-react';
 
 const AnimatedAddToCartButton = ({ onClick, className }) => {
   const [status, setStatus] = useState('idle'); // idle, animating, added
@@ -74,6 +74,26 @@ const AnimatedAddToCartButton = ({ onClick, className }) => {
               className="absolute z-20 flex items-center justify-center"
             >
               <Shirt size={20} className="text-[#111111] fill-[#F8F3EC]" />
+            </motion.div>
+
+            {/* Tick mark popping up after shirt drops */}
+            <motion.div
+              initial={{ y: -12, opacity: 0, scale: 0 }}
+              animate={{ 
+                opacity: [0, 0, 0, 1, 1, 1],
+                scale: [0, 0, 0, 1.2, 1, 1],
+                x: [10, 10, 10, 10, 10, 160]
+              }}
+              transition={{ 
+                duration: 2.2,
+                times: [0, 0.2, 0.5, 0.55, 0.75, 1],
+                ease: "easeInOut" 
+              }}
+              className="absolute z-30 flex items-center justify-center"
+            >
+              <div className="bg-green-500 rounded-full p-0.5 shadow-sm">
+                <Check size={10} className="text-white" strokeWidth={4} />
+              </div>
             </motion.div>
           </motion.div>
         )}
