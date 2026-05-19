@@ -79,9 +79,9 @@ const Layout = () => {
   }, [user]);
 
   return (
-    <div className={`flex flex-col min-h-screen bg-[#0a0a0a] text-white transition-colors duration-300 ${isSpecialPage ? 'overflow-hidden' : ''}`}>
+    <div className={`flex flex-col min-h-screen bg-[#F8F3EC] text-[#111111] transition-colors duration-300 ${isSpecialPage ? 'overflow-hidden' : ''}`}>
       {!isSpecialPage && <Navbar />}
-      <main className={`flex-grow ${isSpecialPage ? '' : 'pt-20'}`}>
+      <main className={`flex-grow ${isSpecialPage ? '' : 'pt-36'}`}>
         <AnimatedRoutes />
       </main>
       {!isSpecialPage && <Footer />}

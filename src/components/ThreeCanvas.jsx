@@ -18,10 +18,10 @@ function AuraCore() {
       <mesh ref={meshRef} scale={0.85}>
         <torusKnotGeometry args={[1.2, 0.35, 256, 64]} />
         <meshStandardMaterial
-          color="#050505"
-          metalness={1}
-          roughness={0.05}
-          envMapIntensity={2.5}
+          color="#F7EFE4"
+          metalness={0.72}
+          roughness={0.12}
+          envMapIntensity={3.2}
         />
       </mesh>
     </group>
@@ -37,16 +37,16 @@ function Pedestal() {
       {/* Base Cylinder */}
       <mesh position={[0, -0.15, 0]}>
         <cylinderGeometry args={[2.2, 2.3, 0.3, 64]} />
-        <meshStandardMaterial color="#020202" metalness={0.8} roughness={0.4} />
+        <meshStandardMaterial color="#E8DCCF" metalness={0.45} roughness={0.28} />
       </mesh>
       
       {/* Glowing Edge - Cyan */}
       <mesh position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]}>
         <torusGeometry args={[2.2, 0.02, 16, 128]} />
         <meshStandardMaterial 
-          color="#00F3FF" 
-          emissive="#00F3FF" 
-          emissiveIntensity={2} 
+          color="#8BE9FD" 
+          emissive="#8BE9FD" 
+          emissiveIntensity={0.9} 
           toneMapped={false} 
         />
       </mesh>
@@ -55,9 +55,9 @@ function Pedestal() {
       <mesh position={[0, -0.05, 0]} rotation={[Math.PI / 2, 0, 0]}>
         <torusGeometry args={[2.22, 0.02, 16, 128]} />
         <meshStandardMaterial 
-          color="#B026FF" 
-          emissive="#B026FF" 
-          emissiveIntensity={1} 
+          color="#C8A2FF" 
+          emissive="#C8A2FF" 
+          emissiveIntensity={0.7} 
           toneMapped={false} 
         />
       </mesh>
@@ -70,7 +70,7 @@ function LoadingRings() {
   return (
     <mesh>
       <torusGeometry args={[1.5, 0.05, 16, 64]} />
-      <meshBasicMaterial color="#00E8FF" transparent opacity={0.3} toneMapped={false} />
+      <meshBasicMaterial color="#C8A2FF" transparent opacity={0.3} toneMapped={false} />
     </mesh>
   );
 }
@@ -87,9 +87,10 @@ const ThreeCanvas = () => (
     >
 
       <Suspense fallback={<LoadingRings />}>
-        <ambientLight intensity={0.2} />
-        <pointLight position={[0, -5, 3]} intensity={2.0} color="#00E8FF" distance={18} />
-        <pointLight position={[5, 5, -5]} intensity={1.5} color="#9B30FF" distance={18} />
+        <ambientLight intensity={0.9} />
+        <pointLight position={[0, -5, 3]} intensity={1.25} color="#8BE9FD" distance={18} />
+        <pointLight position={[5, 5, -5]} intensity={1.4} color="#C8A2FF" distance={18} />
+        <directionalLight position={[-4, 5, 4]} intensity={1.3} color="#fffaf0" />
 
         <PresentationControls
           global
@@ -113,7 +114,7 @@ const ThreeCanvas = () => (
           scale={10}
           blur={3}
           far={4}
-          color="#00aaaa"
+          color="#c9b7a5"
         />
         <Environment preset="city" />
       </Suspense>

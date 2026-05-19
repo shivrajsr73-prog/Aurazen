@@ -27,7 +27,7 @@ const Login = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validate()) {
-      login({ name: 'AuraZen Member', email: formData.email });
+      login({ name: 'Aura Maker Member', email: formData.email });
       toast.success('Successfully logged in!');
       navigate('/');
     } else {
@@ -63,7 +63,7 @@ const Login = () => {
           
           <div className="text-center mb-8">
             <h2 className="text-3xl font-black text-white mb-2 tracking-tighter uppercase">Welcome Back</h2>
-            <p className="text-gray-400 font-medium">Enter your credentials to access your AuraZen account.</p>
+            <p className="text-gray-400 font-medium">Enter your credentials to access your Aura Maker account.</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">

@@ -162,7 +162,7 @@ const Checkout = () => {
       const { error } = await supabase.from('orders').insert([orderData]);
       if (error) throw error;
       
-      toast.success("Order placed successfully! Thank you for shopping with AuraZen.");
+      toast.success("Order placed successfully! Thank you for shopping with Aura Maker.");
       clearCart();
       navigate('/');
     } catch (error) {
@@ -179,9 +179,9 @@ const Checkout = () => {
 
   if (cart.length === 0) {
     return (
-      <motion.div initial="initial" animate="in" exit="out" variants={pageVariants} className="min-h-[70vh] flex flex-col items-center justify-center text-white px-6">
+      <motion.div initial="initial" animate="in" exit="out" variants={pageVariants} className="min-h-[70vh] flex flex-col items-center justify-center text-[#111111] px-6">
         <h2 className="text-3xl font-bold mb-4 tracking-tight">Your cart is empty</h2>
-        <p className="text-gray-400 mb-8 max-w-md text-center">Add some premium items to your cart before checking out.</p>
+        <p className="text-[#625b52] mb-8 max-w-md text-center">Add some premium items to your cart before checking out.</p>
         <Link to="/products">
           <Button variant="primary">Return to Shop</Button>
         </Link>
@@ -190,8 +190,8 @@ const Checkout = () => {
   }
 
   return (
-    <motion.div initial="initial" animate="in" exit="out" variants={pageVariants} className="container mx-auto px-6 py-12">
-      <h1 className="text-4xl font-black text-white mb-12 tracking-tighter uppercase">Checkout</h1>
+    <motion.div initial="initial" animate="in" exit="out" variants={pageVariants} className="container mx-auto px-6 py-12 text-[#111111]">
+      <h1 className="text-4xl font-black text-[#111111] mb-12 tracking-tighter uppercase">Checkout</h1>
       
       <form ref={checkoutFormRef} onSubmit={handleCheckout} className="grid grid-cols-1 lg:grid-cols-3 gap-12">
         <motion.div 
@@ -199,31 +199,31 @@ const Checkout = () => {
           animate={{ opacity: 1, y: 0 }}
           className="lg:col-span-2 space-y-8"
         >
-          <div className="flex items-center gap-3 rounded-2xl border border-[#1E1E1E] bg-[#111111] p-3">
+          <div className="flex items-center gap-3 rounded-2xl border border-[#E8DCCF] bg-white/65 p-3 shadow-[0_18px_50px_rgba(72,53,34,0.08)] backdrop-blur-xl">
             <button
               type="button"
               onClick={() => setCheckoutStep('address')}
-              className={`flex-1 rounded-xl px-4 py-3 text-xs font-black uppercase tracking-widest transition-all ${checkoutStep === 'address' ? 'bg-[#00F3FF] text-black' : 'text-gray-400 hover:text-white'}`}
+              className={`flex-1 rounded-xl px-4 py-3 text-xs font-black uppercase tracking-widest transition-all ${checkoutStep === 'address' ? 'bg-[#C8A2FF]/30 text-[#111111]' : 'text-[#625b52] hover:text-[#111111]'}`}
             >
               1. Address
             </button>
             <button
               type="button"
               onClick={handleContinueToPayment}
-              className={`flex-1 rounded-xl px-4 py-3 text-xs font-black uppercase tracking-widest transition-all ${checkoutStep === 'payment' ? 'bg-[#00F3FF] text-black' : 'text-gray-400 hover:text-white'}`}
+              className={`flex-1 rounded-xl px-4 py-3 text-xs font-black uppercase tracking-widest transition-all ${checkoutStep === 'payment' ? 'bg-[#C8A2FF]/30 text-[#111111]' : 'text-[#625b52] hover:text-[#111111]'}`}
             >
               2. Payment
             </button>
           </div>
 
-          <div className="bg-[#111111] p-8 rounded-2xl border border-[#1E1E1E]">
-            <h2 className="text-xl font-bold uppercase tracking-wider text-white mb-6">Shipping Address</h2>
+          <div className="bg-white/65 p-8 rounded-2xl border border-[#E8DCCF] shadow-[0_20px_60px_rgba(72,53,34,0.08)] backdrop-blur-xl">
+            <h2 className="text-xl font-bold uppercase tracking-wider text-[#111111] mb-6">Shipping Address</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Input label="First Name" name="firstName" placeholder="Jane" required />
               <Input label="Last Name" name="lastName" placeholder="Doe" required />
               <Input label="Email Address" name="email" type="email" placeholder="jane@example.com" className="md:col-span-2" required />
-              <Input label="Address" name="address" placeholder="123 Cyber Ave" className="md:col-span-2" required />
-              <Input label="City" name="city" placeholder="Neo Tokyo" required />
+              <Input label="Address" name="address" placeholder="123 Cream Ave" className="md:col-span-2" required />
+              <Input label="City" name="city" placeholder="Mumbai" required />
               <Input label="Postal Code" name="postalCode" placeholder="100-0001" required />
             </div>
             {checkoutStep === 'address' && (
@@ -237,18 +237,18 @@ const Checkout = () => {
             <motion.div
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-[#111111] p-8 rounded-2xl border border-[#1E1E1E]"
+              className="bg-white/65 p-8 rounded-2xl border border-[#E8DCCF] shadow-[0_20px_60px_rgba(72,53,34,0.08)] backdrop-blur-xl"
             >
-              <h2 className="text-xl font-bold uppercase tracking-wider text-white mb-6">Payment Method</h2>
+              <h2 className="text-xl font-bold uppercase tracking-wider text-[#111111] mb-6">Payment Method</h2>
               <div className="space-y-6">
-                <div className="flex items-center justify-between bg-[#0a0a0a] p-4 rounded-xl border border-[#00F3FF] shadow-[0_0_10px_rgba(0,243,255,0.1)]">
+                <div className="flex items-center justify-between bg-[#FFFDF9] p-4 rounded-xl border border-[#C8A2FF]/60 shadow-[0_0_18px_rgba(200,162,255,0.12)]">
                   <div className="flex items-center space-x-3">
-                    <input type="radio" name="payment" id="card" className="text-[#00F3FF] focus:ring-[#00F3FF] bg-[#111111] border-[#333]" defaultChecked />
-                    <label htmlFor="card" className="text-white font-bold uppercase tracking-widest text-sm">Credit / Debit Card</label>
+                    <input type="radio" name="payment" id="card" className="text-[#C8A2FF] focus:ring-[#C8A2FF] bg-white border-[#E8DCCF]" defaultChecked />
+                    <label htmlFor="card" className="text-[#111111] font-bold uppercase tracking-widest text-sm">Credit / Debit Card</label>
                   </div>
                   <div className="flex space-x-2">
-                    <div className="w-8 h-5 bg-[#333] rounded"></div>
-                    <div className="w-8 h-5 bg-[#333] rounded"></div>
+                    <div className="w-8 h-5 bg-[#E8DCCF] rounded"></div>
+                    <div className="w-8 h-5 bg-[#C8A2FF]/35 rounded"></div>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-6 mt-4">
@@ -266,24 +266,24 @@ const Checkout = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
-          <div className="bg-[#111111] p-8 rounded-2xl sticky top-24 border border-[#1E1E1E]">
-            <h2 className="text-xl font-bold uppercase tracking-wider text-white mb-6">Order Summary</h2>
+          <div className="bg-white/70 p-8 rounded-2xl sticky top-24 border border-[#E8DCCF] shadow-[0_20px_60px_rgba(72,53,34,0.08)] backdrop-blur-xl">
+            <h2 className="text-xl font-bold uppercase tracking-wider text-[#111111] mb-6">Order Summary</h2>
             
             <div className="space-y-4 mb-6 max-h-[400px] overflow-y-auto pr-2">
               {cart.map(item => (
-                <div key={item.id} className="flex items-center space-x-4 bg-[#0a0a0a] p-3 rounded-xl border border-[#1E1E1E]">
-                  <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded-lg mix-blend-screen opacity-90" />
+                <div key={item.id} className="flex items-center space-x-4 bg-[#FFFDF9] p-3 rounded-xl border border-[#E8DCCF]">
+                  <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded-lg" />
                   <div className="flex-1">
-                    <h4 className="text-sm font-bold text-white line-clamp-1">{item.name}</h4>
-                    <p className="text-gray-500 text-xs mt-1 font-bold">Qty: {item.quantity}</p>
+                    <h4 className="text-sm font-bold text-[#111111] line-clamp-1">{item.name}</h4>
+                    <p className="text-[#7a7168] text-xs mt-1 font-bold">Qty: {item.quantity}</p>
                   </div>
-                  <span className="text-white font-bold">₹{(Number(item.price || 0) * item.quantity).toFixed(2)}</span>
+                  <span className="text-[#111111] font-bold">₹{(Number(item.price || 0) * item.quantity).toFixed(2)}</span>
                 </div>
               ))}
             </div>
 
-            <div className="border-t border-[#1E1E1E] pt-6 mb-6">
-              <label htmlFor="coupon" className="block text-xs font-bold uppercase tracking-widest text-gray-300 mb-3">
+            <div className="border-t border-[#E8DCCF] pt-6 mb-6">
+              <label htmlFor="coupon" className="block text-xs font-bold uppercase tracking-widest text-[#4f4942] mb-3">
                 Coupon Code
               </label>
               <div className="flex gap-3">
@@ -292,49 +292,49 @@ const Checkout = () => {
                   type="text"
                   value={couponCode}
                   onChange={(event) => setCouponCode(event.target.value)}
-                  placeholder="AURAZEN10"
-                  className="min-w-0 flex-1 rounded-lg border border-[#333] bg-[#0a0a0a] px-4 py-3 text-sm font-bold uppercase tracking-wider text-white placeholder-gray-600 outline-none transition-all focus:border-[#00F3FF] focus:ring-2 focus:ring-[#00F3FF]/30"
+                  placeholder="AURAMAKER10"
+                  className="min-w-0 flex-1 rounded-lg border border-[#E8DCCF] bg-white/60 px-4 py-3 text-sm font-bold uppercase tracking-wider text-[#111111] placeholder-[#8c8278] outline-none transition-all focus:border-[#C8A2FF] focus:ring-2 focus:ring-[#C8A2FF]/25"
                 />
                 <Button type="button" variant="secondary" className="px-5" onClick={applyCoupon} disabled={isApplyingCoupon}>
                   {isApplyingCoupon ? 'Checking' : 'Apply'}
                 </Button>
               </div>
               {appliedCoupon && (
-                <div className="mt-3 flex items-center justify-between rounded-lg border border-[#00F3FF]/30 bg-[#00F3FF]/10 px-4 py-3 text-sm">
-                  <span className="font-bold text-[#00F3FF]">{appliedCoupon.code} applied</span>
-                  <button type="button" onClick={removeCoupon} className="font-bold text-gray-300 hover:text-white">
+                <div className="mt-3 flex items-center justify-between rounded-lg border border-[#C8A2FF]/35 bg-[#C8A2FF]/10 px-4 py-3 text-sm">
+                  <span className="font-bold text-[#7d55bd]">{appliedCoupon.code} applied</span>
+                  <button type="button" onClick={removeCoupon} className="font-bold text-[#625b52] hover:text-[#111111]">
                     Remove
                   </button>
                 </div>
               )}
             </div>
 
-            <div className="border-t border-[#1E1E1E] pt-6 space-y-4 text-sm font-medium">
-              <div className="flex justify-between text-gray-400">
+            <div className="border-t border-[#E8DCCF] pt-6 space-y-4 text-sm font-medium">
+              <div className="flex justify-between text-[#625b52]">
                 <span>Subtotal</span>
-                <span className="text-white font-bold">₹{cartTotal.toFixed(2)}</span>
+                <span className="text-[#111111] font-bold">₹{cartTotal.toFixed(2)}</span>
               </div>
               {appliedCoupon && (
-                <div className="flex justify-between text-gray-400">
+                <div className="flex justify-between text-[#625b52]">
                   <span>Discount ({appliedCoupon.code})</span>
-                  <span className="font-bold text-[#00F3FF]">-₹{couponDiscount.toFixed(2)}</span>
+                  <span className="font-bold text-[#7d55bd]">-₹{couponDiscount.toFixed(2)}</span>
                 </div>
               )}
               {appliedCoupon && (
-                <div className="flex justify-between text-gray-400">
+                <div className="flex justify-between text-[#625b52]">
                   <span>After Discount</span>
-                  <span className="text-white font-bold">₹{discountedSubtotal.toFixed(2)}</span>
+                  <span className="text-[#111111] font-bold">₹{discountedSubtotal.toFixed(2)}</span>
                 </div>
               )}
-              <div className="flex justify-between text-gray-400">
+              <div className="flex justify-between text-[#625b52]">
                 <span>Shipping</span>
-                <span className="text-[#00F3FF] font-bold">Free</span>
+                <span className="text-[#7d55bd] font-bold">Free</span>
               </div>
-              <div className="flex justify-between text-gray-400">
+              <div className="flex justify-between text-[#625b52]">
                 <span>Tax (10%)</span>
-                <span className="text-white font-bold">₹{taxAmount.toFixed(2)}</span>
+                <span className="text-[#111111] font-bold">₹{taxAmount.toFixed(2)}</span>
               </div>
-              <div className="border-t border-[#1E1E1E] pt-6 flex justify-between font-black text-xl text-white">
+              <div className="border-t border-[#E8DCCF] pt-6 flex justify-between font-black text-xl text-[#111111]">
                 <span className="uppercase">Total</span>
                 <span>
                   ₹{orderTotal.toFixed(2)}
@@ -352,7 +352,7 @@ const Checkout = () => {
               </Button>
             )}
             
-            <p className="text-center text-xs text-gray-500 mt-4 font-medium">
+            <p className="text-center text-xs text-[#7a7168] mt-4 font-medium">
               By completing your order, you agree to our Terms of Service and Privacy Policy.
             </p>
           </div>

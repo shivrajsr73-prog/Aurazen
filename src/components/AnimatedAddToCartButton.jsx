@@ -26,7 +26,7 @@ const AnimatedAddToCartButton = ({ onClick, className }) => {
   return (
     <button
       className={`luxury-button relative flex w-full items-center justify-center overflow-hidden rounded-2xl border py-5 text-sm font-black uppercase tracking-[0.18em] transition-all ${
-        status === 'added' ? 'luxury-button-glow text-black' : 'luxury-button-secondary text-white hover:border-[#00F3FF]/70 hover:shadow-[0_0_26px_rgba(0,243,255,0.22)]'
+        status === 'added' ? 'luxury-button-glow text-[#111111]' : 'luxury-button-secondary text-[#111111] hover:border-[#C8A2FF]/70 hover:shadow-[0_0_26px_rgba(200,162,255,0.22)]'
       } ${className}`}
       onClick={handleClick}
       disabled={status !== 'idle'}
@@ -54,7 +54,7 @@ const AnimatedAddToCartButton = ({ onClick, className }) => {
               transition={{ duration: 2.2, times: [0, 0.2, 0.5, 0.75, 1], ease: "easeInOut" }}
               className="absolute z-10"
             >
-              <ShoppingCart size={28} className="text-[#00F3FF]" />
+              <ShoppingCart size={28} className="text-[#7d55bd]" />
             </motion.div>
 
             {/* Shirt dropping into cart and leaving with it */}
@@ -73,7 +73,7 @@ const AnimatedAddToCartButton = ({ onClick, className }) => {
               }}
               className="absolute z-20 flex items-center justify-center"
             >
-              <Shirt size={20} className="text-white fill-white" />
+              <Shirt size={20} className="text-[#111111] fill-[#F8F3EC]" />
             </motion.div>
           </motion.div>
         )}

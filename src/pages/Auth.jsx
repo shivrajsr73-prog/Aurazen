@@ -104,10 +104,10 @@ const Auth = ({ initialMode = 'login' }) => {
             'Accept': 'application/json'
           },
           body: JSON.stringify({
-            _subject: "🔑 AURAZEN - Password Recovery Security OTP",
+            _subject: "AURA MAKER - Password Recovery Security OTP",
             "Recovery Code": code,
             "Target Email": forgotEmail,
-            message: `Your requested 6-digit security recovery OTP code for AURAZEN is: ${code}. Please enter this OTP in the recovery panel to complete setting your new password.`,
+            message: `Your requested 6-digit security recovery OTP code for AURA MAKER is: ${code}. Please enter this OTP in the recovery panel to complete setting your new password.`,
             _captcha: "false"
           })
         })
@@ -140,7 +140,7 @@ const Auth = ({ initialMode = 'login' }) => {
           users[userIndex].password = newPassword;
           updatedUser = users[userIndex];
         } else {
-          updatedUser = { name: "Aurazen Member", email: forgotEmail, password: newPassword };
+          updatedUser = { name: "Aura Maker Member", email: forgotEmail, password: newPassword };
           users.push(updatedUser);
         }
         localStorage.setItem('aurawear_registered_users', JSON.stringify(users));
@@ -425,7 +425,7 @@ const Auth = ({ initialMode = 'login' }) => {
                     <span>Sign in with Google</span>
                   </div>
                   <h1 class="title">Choose an account</h1>
-                  <p class="subtitle">to continue to <strong>aurazen.com</strong></p>
+                  <p class="subtitle">to continue to <strong>auramaker.com</strong></p>
                 </div>
                 
                 <div class="right-side">
@@ -463,7 +463,7 @@ const Auth = ({ initialMode = 'login' }) => {
                       </div>
                     </div>
 
-                    <div class="use-another" onclick="selectAccount('New Aurazen Member', 'guest@aurazen.com')">
+                    <div class="use-another" onclick="selectAccount('New Aura Maker Member', 'guest@auramaker.com')">
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 12px;">
                         <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
                         <circle cx="9" cy="7" r="4"></circle>
@@ -632,7 +632,7 @@ const Auth = ({ initialMode = 'login' }) => {
                 <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
               </svg>
               <h1 class="title">Log in with Facebook</h1>
-              <p class="subtitle">Select an account to continue to Aurazen</p>
+              <p class="subtitle">Select an account to continue to Aura Maker</p>
 
               <div class="accounts-list">
                 <div class="account-item" onclick="selectAccount('Shiv Raj', 'shivraj.sr73@gmail.com')">
@@ -872,7 +872,7 @@ const Auth = ({ initialMode = 'login' }) => {
                         type="button"
                         onMouseDown={(e) => e.preventDefault()}
                         onClick={() => setShowNewPassword(!showNewPassword)}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-[#00F3FF] transition-colors z-10"
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-[#9c9289] hover:text-[#7d55bd] transition-colors z-10"
                       >
                         {showNewPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                       </button>
@@ -913,7 +913,7 @@ const Auth = ({ initialMode = 'login' }) => {
                             }
                             toast.success("OTP sent! Use 123456 to verify.");
                           }}
-                          className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] uppercase tracking-wider font-bold text-[#00F3FF] hover:text-white transition-colors bg-black/50 px-2 py-1 rounded-sm border border-[#00F3FF]/30"
+                          className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] uppercase tracking-wider font-bold text-[#7d55bd] hover:text-[#111] transition-colors bg-[#F8F3EC]/80 px-2 py-1 rounded-sm border border-[#C8A2FF]/40"
                         >
                           Get OTP
                         </button>
@@ -960,7 +960,7 @@ const Auth = ({ initialMode = 'login' }) => {
                       type="button"
                       onMouseDown={(e) => e.preventDefault()}
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-[#00F3FF] transition-colors z-10"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-[#9c9289] hover:text-[#7d55bd] transition-colors z-10"
                     >
                       {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                     </button>
@@ -978,7 +978,7 @@ const Auth = ({ initialMode = 'login' }) => {
                       setForgotStep('request');
                       setForgotEmail(email); // Autofill email if they typed something!
                     }}
-                    className="text-[#00F3FF] hover:text-[#B026FF] transition-colors bg-transparent border-none p-0 cursor-pointer text-xs font-semibold"
+                    className="text-[#7d55bd] hover:text-[#111111] transition-colors bg-transparent border-none p-0 cursor-pointer text-xs font-semibold"
                   >
                     Forgot Password?
                   </button>
@@ -998,23 +998,23 @@ const Auth = ({ initialMode = 'login' }) => {
 
               <div className="mt-6 text-center">
                 {mode === 'forgot' ? (
-                  <p className="text-gray-400 text-sm">
-                    Remembered password?{' '}
+                  <p className="text-[#7a7168] text-sm">
+                      Remembered password?{' '}
                     <button 
                       type="button" 
                       onClick={() => setMode('login')} 
-                      className="text-[#00F3FF] hover:text-[#B026FF] transition-colors font-semibold tracking-wide bg-transparent border-none p-0 cursor-pointer"
+                      className="text-[#7d55bd] hover:text-[#111111] transition-colors font-semibold tracking-wide bg-transparent border-none p-0 cursor-pointer"
                     >
                       Back to Login
                     </button>
                   </p>
                 ) : mode === 'login' ? (
-                  <p className="text-gray-400 text-sm">
-                    Don't have an account? <Link to="/signup" className="text-[#00F3FF] hover:text-[#B026FF] transition-colors font-semibold tracking-wide">Sign Up</Link>
+                  <p className="text-[#7a7168] text-sm">
+                  Don't have an account? <Link to="/signup" className="text-[#7d55bd] hover:text-[#111111] transition-colors font-semibold tracking-wide">Sign Up</Link>
                   </p>
                 ) : (
-                  <p className="text-gray-400 text-sm">
-                    Already have an account? <Link to="/login" className="text-[#00F3FF] hover:text-[#B026FF] transition-colors font-semibold tracking-wide">Login</Link>
+                  <p className="text-[#7a7168] text-sm">
+                  Already have an account? <Link to="/login" className="text-[#7d55bd] hover:text-[#111111] transition-colors font-semibold tracking-wide">Login</Link>
                   </p>
                 )}
               </div>

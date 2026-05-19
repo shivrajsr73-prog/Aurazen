@@ -108,10 +108,10 @@ export default function LoginModal({ isOpen, onClose }) {
             'Accept': 'application/json'
           },
           body: JSON.stringify({
-            _subject: "🔑 AURAZEN - Password Recovery Security OTP",
+            _subject: "AURA MAKER - Password Recovery Security OTP",
             "Recovery Code": code,
             "Target Email": forgotEmail,
-            message: `Your requested 6-digit security recovery OTP code for AURAZEN is: ${code}. Please enter this OTP in the recovery panel to complete setting your new password.`,
+            message: `Your requested 6-digit security recovery OTP code for AURA MAKER is: ${code}. Please enter this OTP in the recovery panel to complete setting your new password.`,
             _captcha: "false"
           })
         })
@@ -144,7 +144,7 @@ export default function LoginModal({ isOpen, onClose }) {
           users[userIndex].password = newPassword;
           updatedUser = users[userIndex];
         } else {
-          updatedUser = { name: "Aurazen Member", email: forgotEmail, password: newPassword };
+          updatedUser = { name: "Aura Maker Member", email: forgotEmail, password: newPassword };
           users.push(updatedUser);
         }
         localStorage.setItem('aurawear_registered_users', JSON.stringify(users));
@@ -470,7 +470,7 @@ export default function LoginModal({ isOpen, onClose }) {
                       </div>
                     </div>
 
-                    <div class="use-another" onclick="selectAccount('New Aurazen Member', 'guest@aurazen.com')">
+                    <div class="use-another" onclick="selectAccount('New Aura Maker Member', 'guest@auramaker.com')">
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 12px;">
                         <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
                         <circle cx="9" cy="7" r="4"></circle>
@@ -639,7 +639,7 @@ export default function LoginModal({ isOpen, onClose }) {
                 <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
               </svg>
               <h1 class="title">Log in with Facebook</h1>
-              <p class="subtitle">Select an account to continue to Aurazen</p>
+              <p class="subtitle">Select an account to continue to Aura Maker</p>
 
               <div class="accounts-list">
                 <div class="account-item" onclick="selectAccount('Shiv Raj', 'shivraj.sr73@gmail.com')">

@@ -54,7 +54,7 @@ const Signup = () => {
           
           <div className="text-center mb-8">
             <h2 className="text-3xl font-black text-white mb-2 tracking-tighter uppercase">Create Account</h2>
-            <p className="text-gray-400 font-medium">Join the AuraZen exclusive club.</p>
+            <p className="text-gray-400 font-medium">Join the Aura Maker exclusive club.</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">

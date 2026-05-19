@@ -19,7 +19,7 @@ const AuthOverlay = ({ isVisible, initialMode = 'login' }) => {
       return;
     }
     
-    login({ name: isLogin ? 'AuraZen Member' : formData.name, email: formData.email });
+    login({ name: isLogin ? 'Aura Maker Member' : formData.name, email: formData.email });
     toast.success(isLogin ? 'Successfully logged in!' : 'Account created successfully!');
     navigate('/');
   };
@@ -42,7 +42,7 @@ const AuthOverlay = ({ isVisible, initialMode = 'login' }) => {
             <div className="relative z-10">
               <div className="mb-10">
                 <h2 className="text-4xl font-black text-white mb-2 tracking-tighter uppercase drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]">
-                  {isLogin ? 'Welcome Back' : 'Join AuraZen'}
+                  {isLogin ? 'Welcome Back' : 'Join Aura Maker'}
                 </h2>
                 <p className="text-gray-400 font-medium">
                   {isLogin ? 'Enter your credentials to continue.' : 'Create an account to access premium drops.'}

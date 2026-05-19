@@ -16,10 +16,10 @@ const Wishlist = () => {
   };
 
   return (
-    <motion.div initial="initial" animate="in" exit="out" variants={pageVariants} className="container mx-auto px-6 py-12">
+    <motion.div initial="initial" animate="in" exit="out" variants={pageVariants} className="container mx-auto px-6 py-12 text-[#111111]">
       <div className="flex items-center mb-10">
-        <Heart className="text-white mr-4" size={36} strokeWidth={2} />
-        <h1 className="text-4xl font-black text-white tracking-tighter uppercase">Your Wishlist</h1>
+        <Heart className="text-[#7d55bd] mr-4" size={36} strokeWidth={2} />
+        <h1 className="text-4xl font-black text-[#111111] tracking-tighter uppercase">Your Wishlist</h1>
       </div>
 
       {wishlist.length > 0 ? (
@@ -29,12 +29,12 @@ const Wishlist = () => {
           ))}
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center py-20 bg-[#111111] rounded-3xl border border-[#1E1E1E]">
-          <div className="w-24 h-24 bg-[#0a0a0a] rounded-full flex items-center justify-center mb-6 border border-[#1E1E1E]">
-            <Heart size={40} className="text-gray-600" />
+        <div className="flex flex-col items-center justify-center py-20 bg-white/65 rounded-3xl border border-[#E8DCCF] shadow-[0_20px_60px_rgba(72,53,34,0.08)] backdrop-blur-xl">
+          <div className="w-24 h-24 bg-[#F8F3EC] rounded-full flex items-center justify-center mb-6 border border-[#E8DCCF]">
+            <Heart size={40} className="text-[#7a7168]" />
           </div>
-          <h2 className="text-2xl font-bold text-white mb-4 tracking-tight">Your wishlist is empty</h2>
-          <p className="text-gray-500 mb-8 max-w-md text-center">Save items you love to your wishlist. Review them anytime and easily move them to your cart.</p>
+          <h2 className="text-2xl font-bold text-[#111111] mb-4 tracking-tight">Your wishlist is empty</h2>
+          <p className="text-[#7a7168] mb-8 max-w-md text-center">Save items you love to your wishlist. Review them anytime and easily move them to your cart.</p>
           <Button variant="primary" onClick={() => navigate('/products')} className="px-8 py-4">
             Discover Products
           </Button>

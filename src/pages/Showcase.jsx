@@ -92,7 +92,7 @@ function useFabricTexture() {
 }
 
 // ─────────────────────────────────────────────────────────────
-// AuraZen Logo — canvas texture mapped to a plane on the chest
+// Aura Maker logo texture mapped to a plane on the chest
 // ─────────────────────────────────────────────────────────────
 function useLogoTexture() {
   return useMemo(() => {
@@ -115,7 +115,7 @@ function useLogoTexture() {
     ctx.shadowColor = '#00ffcc';
     ctx.shadowBlur = 18;
     ctx.fillStyle = '#ffffff';
-    ctx.fillText('AURAZEN', w / 2, h / 2 - 16);
+    ctx.fillText('AURA MAKER', w / 2, h / 2 - 16);
 
     // Sub-tagline
     ctx.shadowBlur = 6;
@@ -278,7 +278,7 @@ const Showcase = () => {
 
       {/* Overlay Title — HTML, 100% reliable rendering */}
       <div className="scene-title-overlay">
-        <div className="scene-title-brand">AURAZEN</div>
+        <div className="scene-title-brand">AURA MAKER</div>
         <div className="scene-title-sub">Oversized Collection &mdash; 2025</div>
       </div>
 
