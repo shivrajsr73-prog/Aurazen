@@ -27,34 +27,7 @@ const Home = () => {
       {/* ── Hero Banner Slider ── */}
       <HeroBannerSlider />
 
-      <section className="py-28 bg-[#FFFDF9] border-y border-[#E8DCCF]/70">
-        <div className="container mx-auto px-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              { icon: Zap, title: 'Lightning Fast', desc: 'Same-day delivery in select premium areas.' },
-              { icon: ShieldCheck, title: 'Secure Checkout', desc: 'Encrypted transactions for your peace of mind.' },
-              { icon: Truck, title: 'Global Shipping', desc: 'Delivering luxury streetwear worldwide.' }
-            ].map((feature, idx) => (
-              <motion.div
-                key={idx}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: idx * 0.2 }}
-                className="flex items-center space-x-6 p-8 rounded-3xl bg-white/65 hover:bg-white/90 transition-all duration-500 group border border-[#E8DCCF]/80 hover:border-[#C8A2FF]/60 shadow-[0_24px_80px_rgba(72,53,34,0.08)] backdrop-blur-xl"
-              >
-                <div className="w-16 h-16 rounded-full bg-[#F8F3EC] flex items-center justify-center text-[#111111] border border-[#E8DCCF] group-hover:scale-110 transition-transform duration-500 group-hover:shadow-[0_0_26px_rgba(200,162,255,0.28)] group-hover:text-[#7d55bd] group-hover:border-[#C8A2FF]/60">
-                  <feature.icon size={28} strokeWidth={1.5} />
-                </div>
-                <div>
-                  <h3 className="text-[#111111] font-bold text-lg mb-1 group-hover:text-[#7d55bd] transition-colors">{feature.title}</h3>
-                  <p className="text-[#625b52] text-sm leading-relaxed">{feature.desc}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
+
 
       <section id="trending" className="py-28 bg-[#F8F3EC] relative">
         <div className="container mx-auto px-6">
@@ -106,6 +79,35 @@ const Home = () => {
                     <p className="font-bold tracking-wide text-[#111111]">{test.author}</p>
                     <p className="text-[#625b52] text-sm">{test.role}</p>
                   </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="py-28 bg-[#FFFDF9] border-y border-[#E8DCCF]/70">
+        <div className="container mx-auto px-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              { icon: Zap, title: 'Lightning Fast', desc: 'Same-day delivery in select premium areas.' },
+              { icon: ShieldCheck, title: 'Secure Checkout', desc: 'Encrypted transactions for your peace of mind.' },
+              { icon: Truck, title: 'Global Shipping', desc: 'Delivering luxury streetwear worldwide.' }
+            ].map((feature, idx) => (
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: idx * 0.2 }}
+                className="flex items-center space-x-6 p-8 rounded-3xl bg-white/65 hover:bg-white/90 transition-all duration-500 group border border-[#E8DCCF]/80 hover:border-[#C8A2FF]/60 shadow-[0_24px_80px_rgba(72,53,34,0.08)] backdrop-blur-xl"
+              >
+                <div className="w-16 h-16 rounded-full bg-[#F8F3EC] flex items-center justify-center text-[#111111] border border-[#E8DCCF] group-hover:scale-110 transition-transform duration-500 group-hover:shadow-[0_0_26px_rgba(200,162,255,0.28)] group-hover:text-[#7d55bd] group-hover:border-[#C8A2FF]/60">
+                  <feature.icon size={28} strokeWidth={1.5} />
+                </div>
+                <div>
+                  <h3 className="text-[#111111] font-bold text-lg mb-1 group-hover:text-[#7d55bd] transition-colors">{feature.title}</h3>
+                  <p className="text-[#625b52] text-sm leading-relaxed">{feature.desc}</p>
                 </div>
               </motion.div>
             ))}
