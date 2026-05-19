@@ -23,6 +23,8 @@ import Orders from './pages/Orders';
 import NotFound from './pages/NotFound';
 import LoginModal from './components/LoginModal';
 
+import OrderDetails from './pages/OrderDetails';
+
 const AnimatedRoutes = () => {
   const location = useLocation();
   return (
@@ -39,6 +41,7 @@ const AnimatedRoutes = () => {
         <Route path="/contact" element={<Contact />} />
         <Route path="/about" element={<About />} />
         <Route path="/orders" element={<Orders />} />
+        <Route path="/order/:id" element={<OrderDetails />} />
         <Route path="/showcase" element={<Showcase />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
@@ -81,7 +84,7 @@ const Layout = () => {
   return (
     <div className={`flex flex-col min-h-screen bg-[#F8F3EC] text-[#111111] transition-colors duration-300 ${isSpecialPage ? 'overflow-hidden' : ''}`}>
       {!isSpecialPage && <Navbar />}
-      <main className={`flex-grow ${isSpecialPage ? '' : 'pt-36'}`}>
+      <main className={`flex-grow ${isSpecialPage ? '' : (location.pathname === '/' ? 'pt-28' : 'pt-36')}`}>
         <AnimatedRoutes />
       </main>
       {!isSpecialPage && <Footer />}

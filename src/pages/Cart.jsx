@@ -5,7 +5,7 @@ import { useShop } from '../context/ShopContext';
 import Button from '../components/ui/Button';
 
 const Cart = () => {
-  const { cart, removeFromCart, updateQuantity, cartTotal } = useShop();
+  const { cart, removeFromCart, updateQuantity, cartTotal, user } = useShop();
   const navigate = useNavigate();
 
   const pageVariants = {
@@ -103,7 +103,13 @@ const Cart = () => {
               </div>
             </div>
             
-            <Button variant="primary" className="w-full py-4 text-lg" onClick={() => navigate('/checkout')}>
+            <Button variant="primary" className="w-full py-4 text-lg" onClick={() => {
+              if (!user) {
+                navigate('/login');
+              } else {
+                navigate('/checkout');
+              }
+            }}>
               Secure Checkout
             </Button>
             

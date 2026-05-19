@@ -22,14 +22,16 @@ const Orders = () => {
       const { data, error: ordersError } = await supabase
         .from('orders')
         .select('*')
-        .eq('customer_email', user.email)
         .order('created_at', { ascending: false });
 
       if (ordersError) {
         setError(ordersError.message);
         setOrders([]);
       } else {
-        setOrders(data || []);
+        const filtered = (data || []).filter(o => 
+          o.customer_email?.toLowerCase().trim() === user.email.toLowerCase().trim()
+        );
+        setOrders(filtered);
       }
 
       setIsLoading(false);
@@ -91,20 +93,37 @@ const Orders = () => {
       ) : (
         <div className="space-y-5">
           {orders.map((order) => (
-            <div key={order.id} className="rounded-2xl border border-[#E8DCCF] bg-white/65 p-6 shadow-[0_18px_50px_rgba(72,53,34,0.08)] backdrop-blur-xl">
+            <Link 
+              key={order.id} 
+              to={`/order/${order.id}`}
+              className="block rounded-2xl border border-[#E8DCCF] bg-white/65 p-6 shadow-[0_18px_50px_rgba(72,53,34,0.08)] backdrop-blur-xl transition-all hover:bg-white/80 hover:shadow-[0_24px_60px_rgba(72,53,34,0.12)] hover:-translate-y-1"
+            >
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <p className="text-xs font-bold uppercase tracking-widest text-[#7a7168]">Order #{String(order.id).slice(0, 8)}</p>
-                  <h2 className="mt-1 text-xl font-bold text-[#111111]">{order.status || 'Processing'}</h2>
+                <div className="flex items-center gap-4">
+                  <div className="bg-[#C8A2FF]/10 p-3 rounded-xl text-[#7d55bd] hidden sm:block">
+                    <Package size={24} />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-widest text-[#7a7168]">Order #{String(order.id).slice(0, 8)}</p>
+                    <h2 className="mt-1 text-xl font-bold text-[#111111]">
+                      {order.status || 'Processing'}
+                      {order.status === 'Cancelled' && <span className="ml-2 text-[10px] text-red-500 bg-red-100 px-2 py-0.5 rounded-full uppercase font-bold align-middle">Cancelled</span>}
+                    </h2>
+                  </div>
                 </div>
-                <div className="text-left sm:text-right">
-                  <p className="text-2xl font-black text-[#111111]">₹{Number(order.total_amount || 0).toFixed(2)}</p>
-                  <p className="text-xs font-medium text-[#7a7168]">
-                    {order.created_at ? new Date(order.created_at).toLocaleDateString() : 'Recent order'}
-                  </p>
+                <div className="flex items-center justify-between sm:justify-end gap-6 text-left sm:text-right w-full sm:w-auto">
+                  <div>
+                    <p className="text-2xl font-black text-[#111111]">₹{Number(order.total_amount || 0).toFixed(2)}</p>
+                    <p className="text-xs font-medium text-[#7a7168]">
+                      {order.created_at ? new Date(order.created_at).toLocaleDateString() : 'Recent order'}
+                    </p>
+                  </div>
+                  <div className="text-[#7a7168] bg-white/50 p-2 rounded-full border border-[#E8DCCF]">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" /></svg>
+                  </div>
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       )}

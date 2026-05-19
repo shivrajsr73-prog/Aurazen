@@ -9,8 +9,8 @@ const SLIDE_DURATION = 5000;
 
 // Banner config — category maps to which product category to navigate
 const BANNER_CONFIG = [
-  { id: 1, image: banner01, alt: 'T-Shirts Collection', category: 'T-Shirts' },
-  { id: 2, image: banner02, alt: 'Hoodies Collection',  category: 'Hoodies'  },
+  { id: 1, image: banner01, alt: 'Hoodies Collection', category: 'Hoodies' },
+  { id: 2, image: banner02, alt: 'T-Shirts Collection',  category: 'T-Shirts'  },
 ];
 
 export default function HeroBannerSlider() {
@@ -150,8 +150,6 @@ export default function HeroBannerSlider() {
       {/* ── Slider Container ── */}
       <div
         className="relative w-full overflow-hidden"
-        onMouseEnter={() => setIsPaused(true)}
-        onMouseLeave={() => setIsPaused(false)}
       >
         {/* Invisible height anchor — drives natural image height */}
         <img

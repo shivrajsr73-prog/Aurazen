@@ -1,14 +1,16 @@
-import { useRef, useState } from 'react';
-import { motion } from 'framer-motion';
+import { useRef, useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { X } from 'lucide-react';
 import { useShop } from '../context/ShopContext';
 import { useToast } from '../context/ToastContext';
 import { Link, useNavigate } from 'react-router-dom';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 import { supabase } from '../supabase';
+import paymentScannerImg from '../../images/Payment scanner.jpeg';
 
 const Checkout = () => {
-  const { cart, cartTotal, clearCart } = useShop();
+  const { cart, cartTotal, clearCart, user } = useShop();
   const toast = useToast();
   const navigate = useNavigate();
   const checkoutFormRef = useRef(null);
@@ -16,6 +18,34 @@ const Checkout = () => {
   const [couponCode, setCouponCode] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState(null);
   const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState('online');
+  const [showScannerModal, setShowScannerModal] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(300);
+  const [orderConfirmed, setOrderConfirmed] = useState(false);
+
+  useEffect(() => {
+    let interval = null;
+    if (showScannerModal && timeLeft > 0) {
+      interval = setInterval(() => {
+        setTimeLeft((prev) => prev - 1);
+      }, 1000);
+    } else if (timeLeft === 0 && showScannerModal) {
+      setShowScannerModal(false);
+      toast.error('Payment time expired. Please try again.');
+    }
+    return () => clearInterval(interval);
+  }, [showScannerModal, timeLeft, toast]);
+
+  const formatTime = (seconds) => {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m}:${s < 10 ? '0' : ''}${s}`;
+  };
+
+  const handleShowScanner = () => {
+    setTimeLeft(300);
+    setShowScannerModal(true);
+  };
 
   const couponDiscount = appliedCoupon
     ? appliedCoupon.type === 'percent'
@@ -25,6 +55,62 @@ const Checkout = () => {
   const discountedSubtotal = Math.max(cartTotal - couponDiscount, 0);
   const taxAmount = discountedSubtotal * 0.1;
   const orderTotal = discountedSubtotal + taxAmount;
+
+  useEffect(() => {
+    if (checkoutStep === 'address') {
+      const form = checkoutFormRef.current;
+      
+      // Prevent asking if already filled
+      if (form && (form.elements['city']?.value || form.elements['postalCode']?.value)) {
+        return;
+      }
+
+      // Check if geolocation is supported
+      if ("geolocation" in navigator) {
+        // Request location after a short delay for better UX
+        const timer = setTimeout(() => {
+          navigator.geolocation.getCurrentPosition(
+            async (position) => {
+              try {
+                const { latitude, longitude } = position.coords;
+                const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+                const data = await response.json();
+                
+                if (data && data.address) {
+                  const city = data.address.city || data.address.town || data.address.village || data.address.county || data.address.state_district || '';
+                  const postcode = data.address.postcode || '';
+                  
+                  if (form) {
+                    if (form.elements['city'] && city && !form.elements['city'].value) {
+                      form.elements['city'].value = city;
+                    }
+                    if (form.elements['postalCode'] && postcode && !form.elements['postalCode'].value) {
+                      form.elements['postalCode'].value = postcode;
+                    }
+                    toast.success("Location auto-filled successfully!");
+                  }
+                }
+              } catch (error) {
+                console.error("Error fetching location details:", error);
+              }
+            },
+            (error) => {
+              console.log("Location access denied or failed:", error);
+              // Optionally show a toast if they denied
+            }
+          );
+        }, 500);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [checkoutStep, toast]);
+
+  useEffect(() => {
+    if (!user) {
+      toast.error("Please login to proceed to checkout.");
+      navigate('/login');
+    }
+  }, [user, navigate, toast]);
 
   const normalizeCoupon = (coupon) => {
     const discountType = String(coupon.discount_type || coupon.type || '').toLowerCase();
@@ -147,7 +233,7 @@ const Checkout = () => {
 
       const orderData = {
         customer_name: `${customerInfo.firstName} ${customerInfo.lastName}`,
-        customer_email: customerInfo.email,
+        customer_email: user?.email || customerInfo.email,
         total_amount: orderTotal,
         status: 'Processing',
         items: cart.map(item => ({
@@ -162,9 +248,8 @@ const Checkout = () => {
       const { error } = await supabase.from('orders').insert([orderData]);
       if (error) throw error;
       
-      toast.success("Order placed successfully! Thank you for shopping with Aura Maker.");
       clearCart();
-      navigate('/');
+      setOrderConfirmed(true);
     } catch (error) {
       console.error("Error creating order: ", error);
       toast.error("Failed to place order.");
@@ -177,7 +262,7 @@ const Checkout = () => {
     out: { opacity: 0, transition: { duration: 0.4 } }
   };
 
-  if (cart.length === 0) {
+  if (cart.length === 0 && !orderConfirmed) {
     return (
       <motion.div initial="initial" animate="in" exit="out" variants={pageVariants} className="min-h-[70vh] flex flex-col items-center justify-center text-[#111111] px-6">
         <h2 className="text-3xl font-bold mb-4 tracking-tight">Your cart is empty</h2>
@@ -240,22 +325,28 @@ const Checkout = () => {
               className="bg-white/65 p-8 rounded-2xl border border-[#E8DCCF] shadow-[0_20px_60px_rgba(72,53,34,0.08)] backdrop-blur-xl"
             >
               <h2 className="text-xl font-bold uppercase tracking-wider text-[#111111] mb-6">Payment Method</h2>
-              <div className="space-y-6">
-                <div className="flex items-center justify-between bg-[#FFFDF9] p-4 rounded-xl border border-[#C8A2FF]/60 shadow-[0_0_18px_rgba(200,162,255,0.12)]">
+              <div className="space-y-4">
+                <label className={`flex items-center justify-between p-4 rounded-xl border cursor-pointer transition-all ${paymentMethod === 'online' ? 'bg-[#FFFDF9] border-[#C8A2FF]/60 shadow-[0_0_18px_rgba(200,162,255,0.12)]' : 'bg-white/40 border-[#E8DCCF] hover:bg-white/80'}`}>
                   <div className="flex items-center space-x-3">
-                    <input type="radio" name="payment" id="card" className="text-[#C8A2FF] focus:ring-[#C8A2FF] bg-white border-[#E8DCCF]" defaultChecked />
-                    <label htmlFor="card" className="text-[#111111] font-bold uppercase tracking-widest text-sm">Credit / Debit Card</label>
+                    <input type="radio" name="payment" value="online" checked={paymentMethod === 'online'} onChange={() => setPaymentMethod('online')} className="text-[#C8A2FF] focus:ring-[#C8A2FF] bg-white border-[#E8DCCF]" />
+                    <span className="text-[#111111] font-bold uppercase tracking-widest text-sm">Online Payment</span>
                   </div>
-                  <div className="flex space-x-2">
-                    <div className="w-8 h-5 bg-[#E8DCCF] rounded"></div>
-                    <div className="w-8 h-5 bg-[#C8A2FF]/35 rounded"></div>
+                </label>
+                
+                {paymentMethod === 'online' && (
+                  <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="flex justify-center p-4">
+                    <Button type="button" onClick={handleShowScanner} variant="secondary" className="w-full font-bold tracking-widest text-sm py-3 border-[#C8A2FF] text-[#7d55bd] hover:bg-[#C8A2FF]/10">
+                      SHOW SCANNER
+                    </Button>
+                  </motion.div>
+                )}
+
+                <label className={`flex items-center justify-between p-4 rounded-xl border cursor-pointer transition-all ${paymentMethod === 'cod' ? 'bg-[#FFFDF9] border-[#C8A2FF]/60 shadow-[0_0_18px_rgba(200,162,255,0.12)]' : 'bg-white/40 border-[#E8DCCF] hover:bg-white/80'}`}>
+                  <div className="flex items-center space-x-3">
+                    <input type="radio" name="payment" value="cod" checked={paymentMethod === 'cod'} onChange={() => setPaymentMethod('cod')} className="text-[#C8A2FF] focus:ring-[#C8A2FF] bg-white border-[#E8DCCF]" />
+                    <span className="text-[#111111] font-bold uppercase tracking-widest text-sm">Cash on Delivery</span>
                   </div>
-                </div>
-                <div className="grid grid-cols-2 gap-6 mt-4">
-                  <Input name="cardNumber" placeholder="Card Number" className="col-span-2" required />
-                  <Input name="cardExpiry" placeholder="MM/YY" required />
-                  <Input name="cardCvc" placeholder="CVC" required />
-                </div>
+                </label>
               </div>
             </motion.div>
           )}
@@ -358,6 +449,83 @@ const Checkout = () => {
           </div>
         </motion.div>
       </form>
+
+      <AnimatePresence>
+        {showScannerModal && (
+          <motion.div 
+            initial={{ opacity: 0 }} 
+            animate={{ opacity: 1 }} 
+            exit={{ opacity: 0 }} 
+            className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-[#111111]/80 backdrop-blur-md"
+          >
+            <motion.div 
+              initial={{ scale: 0.9, y: 20 }} 
+              animate={{ scale: 1, y: 0 }} 
+              exit={{ scale: 0.9, y: 20 }}
+              className="bg-[#FFFDF9] rounded-3xl p-10 max-w-md w-full shadow-[0_24px_80px_rgba(200,162,255,0.2)] relative flex flex-col items-center border border-[#C8A2FF]/30"
+            >
+              <button type="button" onClick={() => setShowScannerModal(false)} className="absolute top-6 right-6 text-[#7a7168] hover:text-[#111111] transition-colors bg-[#F8F3EC] p-2 rounded-full">
+                <X size={20} />
+              </button>
+              <h3 className="text-2xl font-black uppercase tracking-wider text-[#111111] mb-2 text-center">Scan to Pay</h3>
+              <p className="text-[#625b52] font-medium text-center mb-6">Complete your payment before the timer runs out</p>
+              
+              <div className="bg-[#F8F3EC] px-6 py-3 rounded-full mb-8 shadow-inner border border-[#E8DCCF]">
+                <div className={`text-4xl font-black tabular-nums tracking-widest ${timeLeft < 60 ? 'text-red-500' : 'text-[#7d55bd]'}`}>
+                  {formatTime(timeLeft)}
+                </div>
+              </div>
+              
+              <div className="bg-white p-4 rounded-2xl shadow-sm border border-[#E8DCCF] mb-6">
+                <img src={paymentScannerImg} alt="Payment Scanner" className="w-64 h-64 object-contain" draggable={false} />
+              </div>
+              
+              <div className="w-full space-y-3">
+                <Button type="button" variant="primary" className="w-full py-4" onClick={() => setShowScannerModal(false)}>
+                  I have completed the payment
+                </Button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {orderConfirmed && (
+          <motion.div 
+            initial={{ opacity: 0 }} 
+            animate={{ opacity: 1 }} 
+            exit={{ opacity: 0 }} 
+            className="fixed inset-0 z-[60] flex items-center justify-center p-6 bg-[#111111]/90 backdrop-blur-md"
+          >
+            <motion.div 
+              initial={{ scale: 0.9, y: 20 }} 
+              animate={{ scale: 1, y: 0 }} 
+              exit={{ scale: 0.9, y: 20 }}
+              className="bg-[#FFFDF9] rounded-3xl p-10 max-w-md w-full shadow-[0_24px_80px_rgba(200,162,255,0.3)] flex flex-col items-center border border-[#C8A2FF]/40 text-center"
+            >
+              <div className="w-20 h-20 bg-[#C8A2FF]/20 rounded-full flex items-center justify-center mb-6">
+                <svg className="w-10 h-10 text-[#7d55bd]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <h2 className="text-3xl font-black uppercase tracking-wider text-[#111111] mb-2">Order Confirmed!</h2>
+              <p className="text-[#625b52] font-medium mb-8">
+                Thank you for shopping with Aura Maker. Your order has been successfully placed.
+              </p>
+              
+              <div className="w-full space-y-4">
+                <Button type="button" variant="primary" className="w-full py-4" onClick={() => navigate('/orders')}>
+                  View My Orders
+                </Button>
+                <Button type="button" variant="secondary" className="w-full py-4" onClick={() => navigate('/')}>
+                  Continue Shopping
+                </Button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };

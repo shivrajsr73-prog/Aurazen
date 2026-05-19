@@ -47,13 +47,13 @@ const Navbar = () => {
       <header className="absolute top-0 w-full z-40 px-3 py-5 md:py-6 transition-all duration-500">
         <div className={`luxury-navbar-panel w-full px-4 lg:px-8 flex items-center justify-between gap-5 ${isScrolled ? 'is-scrolled' : ''}`}>
           <div className="flex items-center gap-6 lg:gap-8 min-w-0">
-            <Link to="/" className="group flex flex-col items-center leading-none gap-0">
+            <Link to="/" className="group flex flex-col items-center leading-none gap-0 -ml-2 md:-ml-4">
               <img
                 src={logoImg}
                 alt="Aura Maker"
                 className="w-16 h-16 md:w-20 md:h-20 object-contain transition-transform duration-300 group-hover:scale-105 drop-shadow-[0_4px_18px_rgba(200,162,255,0.4)]"
               />
-              <span className="luxury-logo font-black text-[#111111] tracking-widest uppercase transition-colors duration-300 whitespace-nowrap text-sm md:text-base leading-tight -mt-1">
+              <span className="luxury-logo font-black text-[#111111] tracking-widest uppercase transition-colors duration-300 whitespace-nowrap text-sm md:text-base leading-tight -mt-3">
                 AURA <span className="font-extralight text-[#7a7168] group-hover:text-[#7d55bd] transition-colors duration-300">MAKER</span>
               </span>
             </Link>
