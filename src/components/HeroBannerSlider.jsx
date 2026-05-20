@@ -7,9 +7,9 @@ import banner03 from '../../images/banner03.png';
 
 // Banner config — category maps to which product category to navigate
 const BANNER_CONFIG = [
-  { id: 1, image: banner01, alt: 'Hoodies Collection', keyword: 'cursed', category: 'Hoodies' },
-  { id: 2, image: banner02, alt: 'T-Shirts Collection', keyword: 't-shirt', category: 'T-Shirts' },
-  { id: 3, image: banner03, alt: 'New Drops', keyword: 'darkness', category: 'T-Shirts' },
+  { id: 1, image: banner01, alt: 'Hoodies Collection', keyword: 'black', category: 'Hoodies' },
+  { id: 2, image: banner02, alt: 'T-Shirts Collection', keyword: 'anime t-shirt', category: 'T-Shirts' },
+  { id: 3, image: banner03, alt: 'New Drops', keyword: 'new anime', category: 'T-Shirts' },
 ];
 
 export default function HeroBannerSlider() {
@@ -47,7 +47,7 @@ export default function HeroBannerSlider() {
   const scrollBanners = [...BANNER_CONFIG, ...BANNER_CONFIG, ...BANNER_CONFIG];
 
   return (
-    <section className="w-full bg-[#F8F3EC] py-6 overflow-hidden">
+    <section className="w-full bg-[#F8F3EC] pt-4 pb-6 md:py-6 overflow-hidden">
       <style>{`
         @keyframes scrollRight {
           0% { transform: translateX(calc(-100% - 1.5rem)); }

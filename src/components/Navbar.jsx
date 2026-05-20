@@ -44,19 +44,53 @@ const Navbar = () => {
 
   return (
     <>
-      <header className="absolute top-0 w-full z-40 px-3 py-5 md:py-6 transition-all duration-500">
-        <div className={`luxury-navbar-panel w-full px-4 lg:px-8 flex items-center justify-between gap-5 ${isScrolled ? 'is-scrolled' : ''}`}>
-          <div className="flex items-center gap-6 lg:gap-8 min-w-0">
-            <Link to="/" className="group flex flex-col items-center leading-none gap-0 -ml-2 md:-ml-4">
+      <style>{`
+        @keyframes rgbBorderGlow {
+          0%, 100% {
+            border-color: rgba(200, 162, 255, 0.6);
+            box-shadow: 0 0 8px rgba(200, 162, 255, 0.25);
+          }
+          33% {
+            border-color: rgba(125, 85, 189, 0.6);
+            box-shadow: 0 0 8px rgba(125, 85, 189, 0.25);
+          }
+          66% {
+            border-color: rgba(232, 220, 207, 0.85);
+            box-shadow: 0 0 8px rgba(232, 220, 207, 0.35);
+          }
+        }
+        .mobile-search-glow {
+          animation: rgbBorderGlow 5s ease-in-out infinite;
+          border: 1.5px solid transparent;
+        }
+      `}</style>
+      <header className="absolute top-0 w-full z-40 px-2 py-3 md:px-3 md:py-6 transition-all duration-500">
+        <div className={`luxury-navbar-panel w-full px-2.5 md:px-6 lg:px-8 flex items-center justify-between gap-2 md:gap-5 ${isScrolled ? 'is-scrolled' : ''}`}>
+          <div className="flex items-center gap-2 md:gap-6 lg:gap-8 min-w-0 flex-1 md:flex-initial">
+            <Link to="/" className="group flex flex-col items-center leading-none gap-0.5 -ml-1 md:-ml-4 shrink-0">
               <img
                 src={logoImg}
                 alt="Aura Maker"
-                className="w-16 h-16 md:w-20 md:h-20 object-contain transition-transform duration-300 group-hover:scale-105 drop-shadow-[0_4px_18px_rgba(200,162,255,0.4)]"
+                className="w-8 h-8 md:w-20 md:h-20 object-contain transition-transform duration-300 group-hover:scale-105 drop-shadow-[0_4px_18px_rgba(200,162,255,0.4)]"
               />
-              <span className="luxury-logo font-black text-[#111111] tracking-widest uppercase transition-colors duration-300 whitespace-nowrap text-sm md:text-base leading-tight -mt-3">
+              <span className="luxury-logo font-black text-[#111111] tracking-widest uppercase transition-colors duration-300 whitespace-nowrap text-[8px] md:text-base leading-tight -mt-1 md:-mt-3">
                 AURA <span className="font-extralight text-[#7a7168] group-hover:text-[#7d55bd] transition-colors duration-300">MAKER</span>
               </span>
             </Link>
+
+            {/* Mobile Search Bar */}
+            <form onSubmit={handleSearch} className="flex md:hidden flex-1 max-w-[130px] sm:max-w-xs">
+              <div className="mobile-search-glow flex items-center w-full h-8 rounded-full bg-white/50 px-2.5 gap-1 backdrop-blur-md">
+                <Search size={13} className="text-[#6b6259] shrink-0" />
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full bg-transparent text-[10px] font-semibold text-[#111111] placeholder-[#8c8278] outline-none"
+                />
+              </div>
+            </form>
 
             <form onSubmit={handleSearch} className="aurazen-search-shell hidden md:flex">
               <div className="aurazen-search-inner">
@@ -75,7 +109,7 @@ const Navbar = () => {
             </form>
           </div>
 
-          <div className="flex items-center space-x-6 ml-auto">
+          <div className="flex items-center gap-1.5 sm:gap-3 md:gap-6 ml-auto shrink-0">
             <nav className="hidden md:flex items-center space-x-2 rounded-full border border-[#E8DCCF]/80 bg-white/45 p-1 backdrop-blur-xl shadow-[0_18px_48px_rgba(72,53,34,0.08)]">
               {navLinks.map((link) => {
                 const isActive = location.pathname === link.path || (link.path === '/products' && location.pathname.includes('/product'));
@@ -134,22 +168,22 @@ const Navbar = () => {
               </div>
             )}
 
-            <Link to="/wishlist" className="luxury-icon-button hidden md:flex relative h-10 w-10 rounded-full">
-              <Heart size={20} strokeWidth={1.5} />
-              {wishlist.length > 0 && <span className="absolute -top-1 -right-1 w-2 h-2 bg-[#C8A2FF] rounded-full shadow-[0_0_10px_rgba(200,162,255,0.75)]" />}
+            <Link to="/wishlist" className="luxury-icon-button relative h-8 w-8 md:h-10 md:w-10 rounded-full flex items-center justify-center">
+              <Heart className="h-4 w-4 md:h-5 md:w-5" strokeWidth={1.5} />
+              {wishlist.length > 0 && <span className="absolute -top-0.5 -right-0.5 md:-top-1 md:-right-1 w-1.5 h-1.5 md:w-2 md:h-2 bg-[#C8A2FF] rounded-full shadow-[0_0_10px_rgba(200,162,255,0.75)]" />}
             </Link>
 
-            <Link to="/cart" className="luxury-icon-button relative h-10 w-10 rounded-full">
-              <ShoppingBag size={20} strokeWidth={1.5} />
+            <Link to="/cart" className="luxury-icon-button relative h-8 w-8 md:h-10 md:w-10 rounded-full flex items-center justify-center">
+              <ShoppingBag className="h-4 w-4 md:h-5 md:w-5" strokeWidth={1.5} />
               {cartCount > 0 && (
-                <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} className="absolute -top-1.5 -right-1.5 bg-[#C8A2FF] text-[#111111] text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full shadow-[0_0_10px_rgba(200,162,255,0.7)]">
+                <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} className="absolute -top-1 -right-1 md:-top-1.5 md:-right-1.5 bg-[#C8A2FF] text-[#111111] text-[8px] md:text-[10px] font-bold w-3.5 h-3.5 md:w-4 md:h-4 flex items-center justify-center rounded-full shadow-[0_0_10px_rgba(200,162,255,0.7)]">
                   {cartCount}
                 </motion.span>
               )}
             </Link>
 
-            <button className="luxury-icon-button h-10 w-10 rounded-full md:hidden" onClick={() => setMobileMenuOpen(!mobileMenuOpen)} aria-label="Open menu">
-              {mobileMenuOpen ? <X size={24} strokeWidth={1.5} /> : <Menu size={24} strokeWidth={1.5} />}
+            <button className="luxury-icon-button h-8 w-8 md:h-10 md:w-10 rounded-full md:hidden flex items-center justify-center" onClick={() => setMobileMenuOpen(!mobileMenuOpen)} aria-label="Open menu">
+              {mobileMenuOpen ? <X className="h-5 w-5 md:h-6 md:w-6" strokeWidth={1.5} /> : <Menu className="h-5 w-5 md:h-6 md:w-6" strokeWidth={1.5} />}
             </button>
           </div>
         </div>

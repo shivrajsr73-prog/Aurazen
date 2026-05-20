@@ -81,10 +81,16 @@ const Layout = () => {
     }
   }, [user]);
 
+  useEffect(() => {
+    if (user) {
+      setShowLoginModal(false);
+    }
+  }, [user]);
+
   return (
     <div className={`flex flex-col min-h-screen bg-[#F8F3EC] text-[#111111] transition-colors duration-300 ${isSpecialPage ? 'overflow-hidden' : ''}`}>
       {!isSpecialPage && <Navbar />}
-      <main className={`flex-grow ${isSpecialPage ? '' : (location.pathname === '/' ? 'pt-28' : 'pt-36')}`}>
+      <main className={`flex-grow ${isSpecialPage ? '' : (location.pathname === '/' ? 'pt-20 md:pt-28' : 'pt-36')}`}>
         <AnimatedRoutes />
       </main>
       {!isSpecialPage && <Footer />}

@@ -121,8 +121,29 @@ export const ShopProvider = ({ children }) => {
 
     setCart(readStoredJson('aurawear_cart', []));
     setWishlist(readStoredJson('aurawear_wishlist', []));
-    setUser(readStoredJson('aurawear_user', null));
     setStorageReady(true);
+
+    // Initialize Supabase Auth Session
+    console.log('[ShopContext] Initializing Supabase Auth Session...');
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log('[ShopContext] getSession resolved:', session);
+      if (session) {
+        setUser(session.user);
+      }
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log(`[ShopContext] onAuthStateChange event: ${event}`, session);
+      if (session) {
+        setUser(session.user);
+      } else {
+        setUser(null);
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   // Save to LocalStorage
@@ -133,12 +154,6 @@ export const ShopProvider = ({ children }) => {
   useEffect(() => {
     if (storageReady) localStorage.setItem('aurawear_wishlist', JSON.stringify(wishlist));
   }, [wishlist, storageReady]);
-
-  useEffect(() => {
-    if (!storageReady) return;
-    if (user) localStorage.setItem('aurawear_user', JSON.stringify(user));
-    else localStorage.removeItem('aurawear_user');
-  }, [user, storageReady]);
 
   const addToCart = (product) => {
     setCart(prev => {
@@ -170,7 +185,11 @@ export const ShopProvider = ({ children }) => {
   };
 
   const login = (userData) => setUser(userData);
-  const logout = () => setUser(null);
+  const logout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) console.error('SignOut error:', error);
+    setUser(null);
+  };
 
   const cartTotal = cart.reduce((total, item) => total + (Number(item.price || 0) * item.quantity), 0);
   const cartCount = cart.reduce((count, item) => count + item.quantity, 0);

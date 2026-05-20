@@ -29,19 +29,19 @@ const Home = () => {
 
 
 
-      <section id="trending" className="py-28 bg-[#F8F3EC] relative">
+      <section id="trending" className="pt-10 pb-28 md:py-28 bg-[#F8F3EC] relative">
         <div className="container mx-auto px-6">
           <div className="flex justify-between items-end mb-16">
             <div>
-              <h2 className="text-5xl font-black text-[#111111] mb-4 tracking-tighter uppercase">Trending Now</h2>
-              <p className="text-[#625b52] text-lg font-medium">Discover our most sought-after minimal gear.</p>
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#111111] mb-4 tracking-tighter uppercase">Trending Now</h2>
+              <p className="text-[#625b52] text-base sm:text-lg font-medium">Discover our most sought-after minimal gear.</p>
             </div>
             <Button variant="ghost" className="hidden md:flex items-center group font-bold tracking-wider uppercase text-sm" onClick={() => navigate('/products')}>
               View All <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" size={16} />
             </Button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-10">
             {products.slice(0, 3).map((product, idx) => (
               <motion.div key={product.id} initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: idx * 0.1, duration: 0.6 }}>
                 <ProductCard product={product} />
@@ -86,7 +86,7 @@ const Home = () => {
         </div>
       </section>
 
-      <section className="py-28 bg-[#FFFDF9] border-y border-[#E8DCCF]/70">
+      <section className="hidden md:block py-28 bg-[#FFFDF9] border-y border-[#E8DCCF]/70">
         <div className="container mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
